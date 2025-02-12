@@ -3,6 +3,7 @@ import Filter from './components/filter'
 import PersonForm from './components/personForm'
 import Persons from './components/persons'
 import axios from 'axios'
+import personService from './services/personService'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,11 +12,11 @@ const App = () => {
   // init data via GET request
   // ===========================================================================
   const hook = () => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
+    personService
+      .getAll()
+      .then(
+        data => setPersons(data)
+      )
   }
   useEffect(hook, [])
 
@@ -45,9 +46,23 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault()
 
-    // prevent duplicate entries
-    if (persons.find(person => person.name === newName) !== undefined) {
-      alert(`${newName} is already added to phonebook`)
+    // if duplicate, update number on user confirmation
+    let foundPerson = persons.find(person => person.name === newName)
+    if (foundPerson !== undefined) {
+      if (window.confirm(`${foundPerson.name} is already added to phonebook, replace the old number with a new one?`)) {
+        const updatedPerson = {
+          id: foundPerson.id,
+          name: foundPerson.name,
+          number: newNumber
+        }
+        personService
+          .update(foundPerson.id, updatedPerson)
+          .then(
+            data => setPersons(
+              persons.map(person => person.id === data.id ? data : person)
+            )
+          )
+      }
       return
     }
 
@@ -55,13 +70,34 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    setPersons(persons.concat(personObject))
+
+    // save remotely
+    personService
+      .create(personObject)
+      .then(
+        data => setPersons(persons.concat(data))
+      )
 
     // reset state and form
     setNewName('')
     setNewNumber('')
     document.getElementById('nameForm').value = ''
     document.getElementById('numberForm').value = ''
+  }
+
+  // ===========================================================================
+  // delete handler
+  // ===========================================================================
+
+  const handleDelete = (id) => {
+    const person = persons.find(person => person.id === id)
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personService
+        .remove(id)
+        .then(
+          data => setPersons(persons.filter(person => person.id !== id))
+        )
+    }
   }
 
   // ===========================================================================
@@ -80,7 +116,7 @@ const App = () => {
         handleSubmit={handleSubmit} />
 
       <h2>Numbers</h2>
-      <Persons persons={persons} searchKey={searchKey} />
+      <Persons persons={persons} searchKey={searchKey} handleDelete={handleDelete} />
     </div>
   )
 }

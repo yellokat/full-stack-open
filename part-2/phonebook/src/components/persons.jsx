@@ -1,6 +1,7 @@
 import React from 'react'
+import DeleteButton from './deleteButton'
 
-const Persons = ({ persons, searchKey }) => {
+const Persons = ({ persons, searchKey, handleDelete }) => {
     return (
         <>
             {
@@ -9,7 +10,7 @@ const Persons = ({ persons, searchKey }) => {
                         person => person.name.toLowerCase().includes(searchKey.toLowerCase())
                     )
                     .map(
-                        person => (<div key={person.name}>{person.name} {person.number}</div>)
+                        person => (<div key={person.name}>{person.name} {person.number} <DeleteButton onClick={()=>handleDelete(person.id)}/></div>)
                     )
             }
         </>
