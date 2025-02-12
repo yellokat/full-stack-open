@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import Filter from './components/filter'
 import PersonForm from './components/personForm'
 import Persons from './components/persons'
-import axios from 'axios'
 import personService from './services/personService'
+import SuccessMessage from './components/successMessage'
+import ErrorMessage from './components/errorMessage'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -26,6 +27,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newName, setNewName] = useState('')
   const [searchKey, setSearchKey] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleNameFormChange = (event) => {
     setNewName(event.target.value)
@@ -37,6 +40,21 @@ const App = () => {
 
   const handleSearchFormChange = (event) => {
     setSearchKey(event.target.value)
+  }
+
+  // show success indicator for 2 seconds
+  const toggleSuccessMessage = (message) => {
+    setSuccessMessage(message)
+    setTimeout(() => {
+      setSuccessMessage('')
+    }, 2000)
+  }
+
+  const toggleErrorMessage = (message) => {
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage('')
+    }, 2000)
   }
 
   // ===========================================================================
@@ -58,9 +76,20 @@ const App = () => {
         personService
           .update(foundPerson.id, updatedPerson)
           .then(
-            data => setPersons(
-              persons.map(person => person.id === data.id ? data : person)
-            )
+            data => {
+              setPersons(
+                persons.map(person => person.id === data.id ? data : person)
+              )
+              toggleSuccessMessage(`Updated ${data.name}'s number.`)
+            }
+          )
+          .catch(
+            error => {
+              if (error.response.status === 404) {
+                toggleErrorMessage(`Information of ${foundPerson.name} has already been removed from server.`)
+                setPersons(persons.filter(person => person.id !== foundPerson.id))
+              }
+            }
           )
       }
       return
@@ -83,6 +112,9 @@ const App = () => {
     setNewNumber('')
     document.getElementById('nameForm').value = ''
     document.getElementById('numberForm').value = ''
+
+    // show success message
+    toggleSuccessMessage(`Added ${personObject.name}.`)
   }
 
   // ===========================================================================
@@ -107,6 +139,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <SuccessMessage message={successMessage} />
+      <ErrorMessage message={errorMessage} />
       <Filter onChange={handleSearchFormChange} />
 
       <h2>add a new</h2>
