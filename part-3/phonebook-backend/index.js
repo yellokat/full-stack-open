@@ -5,6 +5,7 @@
 // imports
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const app = express()
 
 // configure middleware
@@ -22,7 +23,7 @@ const morganConfig = morgan(function (tokens, req, res) {
 // add middleware
 app.use(express.json())
 app.use(morganConfig)
-
+app.use(cors())
 
 // hardcoded data
 let phoneBookData = [
