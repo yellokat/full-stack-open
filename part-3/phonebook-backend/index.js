@@ -24,6 +24,7 @@ const morganConfig = morgan(function (tokens, req, res) {
 app.use(express.json())
 app.use(morganConfig)
 app.use(cors())
+app.use(express.static('dist'))
 
 // hardcoded data
 let phoneBookData = [
@@ -66,11 +67,6 @@ const generateId = () => {
 // ======================================================
 // endpoints
 // ======================================================
-
-// health check
-app.get('/', (request, response) => {
-    return response.send("OK");
-})
 
 // get all persons
 app.get('/api/persons', (request, response) => {
