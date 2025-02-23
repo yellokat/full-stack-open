@@ -1,15 +1,19 @@
 // ======================================================
-// import express & initialize app
+// imports
 // ======================================================
 
-// imports
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const app = express()
+const Person = require('./models/person')
 
-// configure middleware
-const morganConfig = morgan(function (tokens, req, res) {
+// ======================================================
+// middleware configuration
+// ======================================================
+
+// request logger
+const requestLogger = morgan(function (tokens, req, res) {
     return [
         tokens.method(req, res),
         tokens.url(req, res),
@@ -20,49 +24,35 @@ const morganConfig = morgan(function (tokens, req, res) {
     ].join(' ')
 })
 
-// add middleware
-app.use(express.json())
-app.use(morganConfig)
-app.use(cors())
-app.use(express.static('dist'))
-
-// hardcoded data
-let phoneBookData = [
-    {
-        "id": "1",
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": "2",
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": "3",
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": "4",
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
+// error handler middleware
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+    if (error.name === 'CastError') {
+        return response.status(400).send({
+            error: 'malformatted id'
+        })
     }
-];
-
-// helper function to generate unique id
-const MAX_RANDOM_INT = 10 ** 3;
-const generateId = () => {
-    let randomId;
-    while (true) {
-        randomId = `${Math.floor(Math.random() * MAX_RANDOM_INT)}`;
-        let isUnique = phoneBookData.filter(person => person.id === randomId).length === 0;
-        if (isUnique) {
-            break;
-        }
-    }
-    return randomId;
+    next(error)
 }
+
+// unknown endpoint middleware
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({
+        error: 'unknown endpoint'
+    })
+}
+
+// ======================================================
+// initialize app
+// ======================================================
+
+const app = express()
+
+// add middleware
+app.use(express.static('dist'))
+app.use(express.json())
+app.use(requestLogger)
+app.use(cors())
 
 // ======================================================
 // endpoints
@@ -70,42 +60,38 @@ const generateId = () => {
 
 // get all persons
 app.get('/api/persons', (request, response) => {
-    return response.json(phoneBookData);
+    Person.find({}).then(persons => {
+        response.json(persons)
+    })
+})
+
+// get a single person
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id).then(foundPerson => {
+        if (foundPerson) {
+            response.json(foundPerson) // -> application/json 응답 보내기
+        } else {
+            response.status(404).json({
+                error: 'no such resource'
+            })
+        }
+    }).catch(error => next(error))
+})
+
+// delete a single person
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndDelete(request.params.id).then(result => {
+        response.status(204).end()
+    }).catch(error => next(error))
 })
 
 // get info
 app.get('/info', (request, response) => {
-    let count = phoneBookData.length;
-    let dateTime = Date();
-    return response.send(`Phonebook has info for ${count} people <br/><br/> ${dateTime}`)
-
-})
-
-// get a single person
-app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id // -> parameter query 받는 법
-    const person = phoneBookData.find(person => person.id === id);
-
-    if (person) {
-        response.json(person) // -> application/json 응답 보내기
-    } else {
-        response.status(404).json({
-            error : 'no such resource'
-        })
-    }
-})
-
-// delete a single person
-app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    if (phoneBookData.filter(person => person.id === request.params.id).length !== 0) {
-        phoneBookData = phoneBookData.filter(person => person.id !== id);
-        return response.status(204).end()
-    } else {
-        return response.status(404).json({
-            error : 'no such resource'
-        })
-    }
+    Person.find({}).then(persons => {
+        const count = persons.length
+        const dateTime = Date();
+        return response.send(`Phonebook has info for ${count} people <br/><br/> ${dateTime}`)
+    })
 })
 
 // add a single person
@@ -126,28 +112,52 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    // duplicate name handling
-    if (phoneBookData.filter(person => person.name === body.name).length !== 0){
-        return response.status(409).json({
-            error : 'duplicate name'
-        });
+    const person = new Person({
+        name: body.name,
+        number: body.number,
+    })
+
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
+})
+
+// modify a single person
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    // missing field handling
+    if (!body.name) {
+        return response.status(400).json({
+            error: 'name missing'
+        })
+    }
+
+    // missing field handling
+    if (!body.number) {
+        return response.status(400).json({
+            error: 'number missing'
+        })
     }
 
     const person = {
         name: body.name,
         number: body.number,
-        id: generateId(),
     }
 
-    phoneBookData = phoneBookData.concat(person)
-    response.json(person)
+    Person.findByIdAndUpdate(request.params.id, person, {new: true}).then(updatedPerson => {
+        response.json(updatedPerson)
+    }).catch(error => next(error))
 })
+
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
 // ======================================================
 // start server
 // ======================================================
 
-const PORT = 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
