@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+require('dotenv').config({path: '.env'})
 
 // check args
 if (process.argv.length < 3) {
@@ -8,7 +9,7 @@ if (process.argv.length < 3) {
 
 // config db connection
 const password = encodeURIComponent(process.argv[2])
-const url = `mongodb+srv://yellokat:${password}@primary.1oviu.mongodb.net/?retryWrites=true&w=majority&appName=primary`
+const url = process.env.MONGODB_URI
 mongoose.set('strictQuery', false)
 
 // database models
