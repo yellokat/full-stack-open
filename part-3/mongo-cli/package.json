@@ -1,0 +1,14 @@
+{
+  "name": "mongo-cli",
+  "version": "1.0.0",
+  "main": "mongo.js",
+  "scripts": {
+    "test": "echo \"no tests implemented.\""
+  },
+  "author": "Seungwon Jang",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "mongoose": "^8.10.1"
+  }
+}
