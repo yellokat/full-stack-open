@@ -7,6 +7,7 @@ const express = require('express')
 const cors = require('cors')
 const Blog = require("./models/blog")
 const middleware = require("./utils/middleware")
+const blogsRouter = require("./controllers/blogs")
 
 // const app = require("./app")
 // const config = require("./utils/config")
@@ -23,27 +24,10 @@ app.use(middleware.requestLogger)
 app.use(cors())
 
 // ======================================================
-// endpoints
+// routers
 // ======================================================
 
-// get all blogposts
-app.get('/api/blogs', (request, response, next) => {
-  Blog
-    .find({})
-    .then(blogs => {
-      response.json(blogs)
-    }).catch(error=>next(error))
-})
-
-// create a blogpost
-app.post('/api/blogs', (request, response, next) => {
-  const blog = new Blog(request.body)
-  blog
-    .save()
-    .then(result => {
-      response.status(201).json(result)
-    }).catch(error=>next(error))
-})
+app.use('/api/blogs', blogsRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
