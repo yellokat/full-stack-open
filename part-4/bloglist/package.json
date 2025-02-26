@@ -1,0 +1,23 @@
+{
+  "name": "bloglist",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"no tests implemented.\"",
+    "dev": "nodemon index.js",
+    "start": "node --watch index.js"
+  },
+  "author": "Seungwon Jang",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mongoose": "^8.10.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.9"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
