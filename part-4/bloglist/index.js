@@ -8,6 +8,10 @@ const morgan = require('morgan')
 const cors = require('cors')
 const Blog = require("./models/blog")
 
+// const app = require("./app")
+// const config = require("./utils/config")
+const logger = require("./utils/logger")
+
 // ======================================================
 // middleware configuration
 // ======================================================
@@ -63,5 +67,5 @@ app.post('/api/blogs', (request, response) => {
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  logger.info(`Server running on port ${PORT}`)
 })
