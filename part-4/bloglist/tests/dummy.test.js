@@ -4,39 +4,8 @@ const assert = require('node:assert')
 
 // import test targets & scheme
 const listHelper = require('../utils/list_helper')
+const mocks = require('./mocks')
 const Blog = require('../models/blog')
-
-// mock objects
-const blogMock1 = new Blog({
-  "title": "test1",
-  "author": "tester1",
-  "url": "testurl1",
-  "likes": 1
-})
-const blogMock2 = new Blog({
-  "title": "test2",
-  "author": "tester2",
-  "url": "testurl2",
-  "likes": 2
-})
-const blogMock3 = new Blog({
-  "title": "test3",
-  "author": "tester3",
-  "url": "testurl3",
-  "likes": 3
-})
-const blogMock4 = new Blog({
-  "title": "test4",
-  "author": "tester4",
-  "url": "testurl4",
-  "likes": 4
-})
-const blogMock5 = new Blog({
-  "title": "test5",
-  "author": "tester5",
-  "url": "testurl5",
-  "likes": 5
-})
 
 test('dummy returns one', () => {
   const blogs = []
@@ -51,14 +20,20 @@ describe("total likes", () => {
     assert.strictEqual(result, 0)
   })
 
-  test("of a single blog entry", ()=>{
-    const blogs = [blogMock1]
+  test("of a single blog entry", () => {
+    const blogs = [
+      mocks.blogMock1
+    ].map(blog => new Blog(blog))
     const result = listHelper.totalLikes(blogs)
     assert.strictEqual(result, 1)
   })
 
   test("of multiple blog entries", () => {
-    const blogs = [blogMock1, blogMock2, blogMock3]
+    const blogs = [
+      mocks.blogMock1,
+      mocks.blogMock2,
+      mocks.blogMock3
+    ].map(blog => new Blog(blog))
     const result = listHelper.totalLikes(blogs)
     assert.strictEqual(result, 6)
   })
@@ -71,66 +46,90 @@ describe("favorite blog", () => {
     assert.strictEqual(result, null)
   })
 
-  test("of a single blog entry", ()=>{
-    const blogs = [blogMock1]
+  test("of a single blog entry", () => {
+    const blogs = [
+      mocks.blogMock1
+    ].map(blog => new Blog(blog))
     const result = listHelper.favoriteBlog(blogs)
-    assert.deepStrictEqual(result, blogMock1)
+    assert.deepStrictEqual(result, blogs[0])
   })
 
   test("of multiple blog entries", () => {
-    const blogs = [blogMock1, blogMock2, blogMock3]
+    const blogs = [
+      mocks.blogMock1,
+      mocks.blogMock2,
+      mocks.blogMock3,
+    ].map(blog => new Blog(blog))
     const result = listHelper.favoriteBlog(blogs)
-    assert.deepStrictEqual(result, blogMock3)
+    assert.deepStrictEqual(result, blogs[2])
   })
 })
 
-describe("most blogs", ()=>{
+describe("most blogs", () => {
   test("of an empty list", () => {
     const blogs = []
     const result = listHelper.mostBlogs(blogs)
     assert.strictEqual(result, null)
   })
 
-  test("of a single blog entry", ()=>{
-    const blogs = [blogMock1]
+  test("of a single blog entry", () => {
+    const blogs = [
+      mocks.blogMock1
+    ].map(blog => new Blog(blog))
     const result = listHelper.mostBlogs(blogs)
     assert.deepStrictEqual(result, {
-      author: blogMock1.author,
+      author: mocks.blogMock1.author,
       blogs: 1
     })
   })
 
   test("of multiple blog entries", () => {
-    const blogs = [blogMock1, blogMock1, blogMock2, blogMock2, blogMock2, blogMock3]
+    const blogs = [
+      mocks.blogMock1,
+      mocks.blogMock1,
+      mocks.blogMock2,
+      mocks.blogMock2,
+      mocks.blogMock2,
+      mocks.blogMock3
+    ].map(blog => new Blog(blog))
     const result = listHelper.mostBlogs(blogs)
     assert.deepStrictEqual(result, {
-      author: blogMock2.author,
+      author: mocks.blogMock2.author,
       blogs: 3
     })
   })
 })
 
-describe("most liked blogs", ()=> {
+describe("most liked blogs", () => {
   test("of an empty list", () => {
     const blogs = []
     const result = listHelper.mostLikes(blogs)
     assert.strictEqual(result, null)
   })
 
-  test("of a single blog entry", ()=>{
-    const blogs = [blogMock1]
+  test("of a single blog entry", () => {
+    const blogs = [
+      mocks.blogMock1
+    ].map(blog => new Blog(blog))
     const result = listHelper.mostLikes(blogs)
     assert.deepStrictEqual(result, {
-      author: blogMock1.author,
-      likes: blogMock1.likes
+      author: mocks.blogMock1.author,
+      likes: mocks.blogMock1.likes
     })
   })
 
-  test("of multiple blog entries", ()=>{
-    const blogs = [blogMock1, blogMock1, blogMock2, blogMock2, blogMock2, blogMock3]
+  test("of multiple blog entries", () => {
+    const blogs = [
+      mocks.blogMock1,
+      mocks.blogMock1,
+      mocks.blogMock2,
+      mocks.blogMock2,
+      mocks.blogMock2,
+      mocks.blogMock3
+    ].map(blog => new Blog(blog))
     const result = listHelper.mostLikes(blogs)
     assert.deepStrictEqual(result, {
-      author: blogMock2.author,
+      author: mocks.blogMock2.author,
       likes: 6
     })
   })
