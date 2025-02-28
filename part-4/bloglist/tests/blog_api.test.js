@@ -8,7 +8,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
 const mocks = require('./mocks')
-const {initialBlogs} = require("./mocks");
+const {initialBlogs, blogsInDb, getBlogs} = require("./mocks");
 
 // ======================================================
 // initialize app
@@ -49,6 +49,31 @@ test('"id" is used instead of "_id" in server ("_id" is still used in database)'
     assert("id" in blog)
     assert(!("_id" in blog))
   })
+})
+
+test.only('create blog post api test', async ()=>{
+  const newBlog = {
+    title: "New Blog Post",
+    author: "Seungwon Jang",
+    url: "https://www.google.com",
+    likes: 0
+  }
+
+  // return is a JSON, status code 200
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  // return value matches the added content
+  const createdBlog = response.body
+  delete createdBlog.id
+  assert.deepStrictEqual(createdBlog, newBlog)
+
+  // number of blogposts in db has increased by one
+  const blogsInDb = await getBlogs()
+  assert.strictEqual(blogsInDb.length, initialBlogs.length + 1)
 })
 
 // test('the first note is about HTTP methods', async () => {

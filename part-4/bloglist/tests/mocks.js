@@ -33,4 +33,10 @@ const blogMock5 = {
 }
 
 const initialBlogs = [blogMock1, blogMock2, blogMock3, blogMock4, blogMock5]
-module.exports = {blogMock1, blogMock2, blogMock3, blogMock4, blogMock5, initialBlogs}
+
+const getBlogs = async () => {
+  const blogs = await Blog.find({})
+  return blogs.map(blog => blog.toJSON())
+}
+
+module.exports = {blogMock1, blogMock2, blogMock3, blogMock4, blogMock5, initialBlogs, getBlogs}
