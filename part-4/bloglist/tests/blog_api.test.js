@@ -1,7 +1,7 @@
 // ======================================================
 // imports
 // ======================================================
-const {test, after, beforeEach} = require('node:test')
+const {test, after, beforeEach, describe} = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
@@ -43,7 +43,7 @@ test('there are five blog posts', async () => {
   assert.strictEqual(response.body.length, 5)
 })
 
-test('"id" is used instead of "_id" in server ("_id" is still used in database)', async()=>{
+test('"id" is used instead of "_id" in server ("_id" is still used in database)', async () => {
   const response = await api.get('/api/blogs')
   response.body.forEach(blog => {
     assert("id" in blog)
@@ -51,29 +51,49 @@ test('"id" is used instead of "_id" in server ("_id" is still used in database)'
   })
 })
 
-test.only('create blog post api test', async ()=>{
-  const newBlog = {
-    title: "New Blog Post",
-    author: "Seungwon Jang",
-    url: "https://www.google.com",
-    likes: 0
-  }
+describe('create blog', async () => {
+  test('creates blog in server and returns same json as created blog', async () => {
+    const newBlog = {
+      title: "New Blog Post",
+      author: "Seungwon Jang",
+      url: "https://www.google.com",
+      likes: 0
+    }
 
-  // return is a JSON, status code 200
-  const response = await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    // return is a JSON, status code 201
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  // return value matches the added content
-  const createdBlog = response.body
-  delete createdBlog.id
-  assert.deepStrictEqual(createdBlog, newBlog)
+    // return value matches the added content
+    const createdBlog = response.body
+    delete createdBlog.id
+    assert.deepStrictEqual(createdBlog, newBlog)
 
-  // number of blogposts in db has increased by one
-  const blogsInDb = await getBlogs()
-  assert.strictEqual(blogsInDb.length, initialBlogs.length + 1)
+    // number of blogposts in db has increased by one
+    const blogsInDb = await getBlogs()
+    assert.strictEqual(blogsInDb.length, initialBlogs.length + 1)
+  })
+
+  test('default likes is 0', async () => {
+    const newBlog = {
+      title: "New Blog Post",
+      author: "Seungwon Jang",
+      url: "https://www.google.com"
+    }
+
+    // return is a JSON, status code 201
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    // likes is defaulted to 0
+    assert.strictEqual(response.body.likes, 0)
+  })
 })
 
 // test('the first note is about HTTP methods', async () => {
