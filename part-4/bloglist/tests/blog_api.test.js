@@ -31,16 +31,24 @@ beforeEach(async () => {
 // test cases
 // ======================================================
 
-test.only('blogs are returned as json', async () => {
+test('blogs are returned as json', async () => {
   await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/)
 })
 
-test.only('there are five blog posts', async () => {
+test('there are five blog posts', async () => {
   const response = await api.get('/api/blogs')
   assert.strictEqual(response.body.length, 5)
+})
+
+test('"id" is used instead of "_id" in server ("_id" is still used in database)', async()=>{
+  const response = await api.get('/api/blogs')
+  response.body.forEach(blog => {
+    assert("id" in blog)
+    assert(!("_id" in blog))
+  })
 })
 
 // test('the first note is about HTTP methods', async () => {
