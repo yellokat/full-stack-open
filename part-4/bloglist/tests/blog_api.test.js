@@ -94,6 +94,32 @@ describe('create blog', async () => {
     // likes is defaulted to 0
     assert.strictEqual(response.body.likes, 0)
   })
+
+  test.only('"title" field is required', async ()=>{
+    const newBlog = {
+      author: "Seungwon Jang",
+      url: "https://www.google.com"
+    }
+
+    // returns status code 400
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
+
+  test.only('"url" field is required', async ()=>{
+    const newBlog = {
+      title: "New Blog Post",
+      author: "Seungwon Jang",
+    }
+
+    // returns status code 400
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
 })
 
 // test('the first note is about HTTP methods', async () => {
