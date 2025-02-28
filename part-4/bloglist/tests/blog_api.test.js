@@ -136,13 +136,117 @@ describe('delete blog', async () => {
     assert.strictEqual(blogsInDb.length, initialBlogs.length - 1)
   })
 
-  test.only('returns 400 when id is not of length 24', async () => {
+  test.only('returns 400 when id is invalid', async () => {
     await api.delete('/api/blogs/999').expect(400)
   })
 
   test.only('returns 404 when no blog post of given id exists', async () => {
     const randomId = "65dcdafe1234567890abcdef"
     await api.delete(`/api/blogs/${randomId}`).expect(404)
+  })
+})
+
+describe('update blog', async () => {
+  test.only('returns status code 200 on success', async ()=>{
+    // get ID of target blog to delete
+    let blogsInDb = await getBlogs()
+    const targetBlogId = blogsInDb[0].id
+
+    // perform update, should return 200
+    const updatedBlog = {
+      title: "Updated Title",
+      author: "Updated Author",
+      url: "Updated URL",
+      likes: 999
+    }
+    await api
+      .put(`/api/blogs/${targetBlogId}`)
+      .send(updatedBlog)
+      .expect(200)
+  })
+
+  test.only('returns json of updated object on success', async ()=>{
+    // get ID of target blog to delete
+    let blogsInDb = await getBlogs()
+    const targetBlogId = blogsInDb[0].id
+
+    // perform update, should return JSON
+    const updatedBlog = {
+      title: "Updated Title",
+      author: "Updated Author",
+      url: "Updated URL",
+      likes: 999
+    }
+    const response = await api
+      .put(`/api/blogs/${targetBlogId}`)
+      .send(updatedBlog)
+      .expect('Content-Type', /application\/json/)
+
+    // returned json should be equal to update request data
+    const updateResult = response.body
+    delete updateResult.id
+    assert.deepStrictEqual(updatedBlog, updateResult)
+  })
+
+  test.only('target resource is updated', async ()=>{
+    // get ID of target blog to delete
+    let blogsInDb = await getBlogs()
+    const targetBlogId = blogsInDb[0].id
+
+    // perform update
+    const updatedBlog = {
+      title: "Updated Title",
+      author: "Updated Author",
+      url: "Updated URL",
+      likes: 999
+    }
+    await api
+      .put(`/api/blogs/${targetBlogId}`)
+      .send(updatedBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    // fetch updated object from database
+    blogsInDb = await getBlogs()
+    const filteredBlogs = blogsInDb.filter(blog => (blog.id === targetBlogId))
+    assert.strictEqual(filteredBlogs.length, 1)
+
+    // data of object fetched from database should match data of update request
+    const updateResult = filteredBlogs[0]
+    delete updateResult.id
+    assert.deepStrictEqual(updatedBlog, updateResult)
+  })
+
+  test.only('number of blog posts in database stays the same', async () => {
+    // get ID of target blog to delete
+    let blogsInDb = await getBlogs()
+    const targetBlogId = blogsInDb[0].id
+
+    // perform update
+    const updatedBlog = {
+      title: "Updated Title",
+      author: "Updated Author",
+      url: "Updated URL",
+      likes: 999
+    }
+    await api
+      .put(`/api/blogs/${targetBlogId}`)
+      .send(updatedBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    // number of blog posts in database decreases by one
+    blogsInDb = await getBlogs()
+    assert.strictEqual(blogsInDb.length, initialBlogs.length)
+  })
+
+  test.only('returns 400 when id is invalid', async () => {
+    await api.put('/api/blogs/999').expect(400)
+  })
+
+  test.only('returns 404 when no blog post of given id exists', async () => {
+    const randomId = "65dcdafe1234567890abcdef"
+    await api.put(`/api/blogs/${randomId}`).expect(404)
   })
 })
 
