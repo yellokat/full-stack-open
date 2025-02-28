@@ -95,7 +95,7 @@ describe('create blog', async () => {
     assert.strictEqual(response.body.likes, 0)
   })
 
-  test.only('"title" field is required', async ()=>{
+  test('"title" field is required', async ()=>{
     const newBlog = {
       author: "Seungwon Jang",
       url: "https://www.google.com"
@@ -108,7 +108,7 @@ describe('create blog', async () => {
       .expect(400)
   })
 
-  test.only('"url" field is required', async ()=>{
+  test('"url" field is required', async ()=>{
     const newBlog = {
       title: "New Blog Post",
       author: "Seungwon Jang",
@@ -119,6 +119,30 @@ describe('create blog', async () => {
       .post('/api/blogs')
       .send(newBlog)
       .expect(400)
+  })
+})
+
+describe('delete blog', async () => {
+  test.only('number of blog posts in database decreases by one', async () => {
+    // get ID of target blog to delete
+    let blogsInDb = await getBlogs()
+    const targetBlogId = blogsInDb[0].id
+
+    // perform deletion
+    await api.delete(`/api/blogs/${targetBlogId}`).expect(204)
+
+    // number of blog posts in database decreases by one
+    blogsInDb = await getBlogs()
+    assert.strictEqual(blogsInDb.length, initialBlogs.length - 1)
+  })
+
+  test.only('returns 400 when id is not of length 24', async () => {
+    await api.delete('/api/blogs/999').expect(400)
+  })
+
+  test.only('returns 404 when no blog post of given id exists', async () => {
+    const randomId = "65dcdafe1234567890abcdef"
+    await api.delete(`/api/blogs/${randomId}`).expect(404)
   })
 })
 
