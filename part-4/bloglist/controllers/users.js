@@ -5,7 +5,7 @@ const errors = require('../models/errors')
 
 // get all users
 usersRouter.get('/', async (request, response) => {
-  const foundUsers = await User.find({})
+  const foundUsers = await User.find({}).populate('blogs', {title:1, author:1, url:1})
   return response.json(foundUsers)
 })
 
@@ -26,14 +26,19 @@ usersRouter.post('/', async (request, response) => {
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
+  // default owned blog list is empty
+  const blogs = []
+
   // create user -> save user -> return
   const user = new User({
     username,
     name,
     passwordHash,
+    blogs
   })
   const savedUser = await user.save()
-  return response.status(201).json(savedUser)
+  const populatedUser = await savedUser.populate('blogs', {title:1, author:1, url:1})
+  return response.status(201).json(populatedUser)
 })
 
 module.exports = usersRouter
