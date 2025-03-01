@@ -4,7 +4,7 @@ const assert = require('node:assert')
 
 // import test targets & scheme
 const listHelper = require('../utils/list_helper')
-const mocks = require('./mocks')
+const mocks = require('./mocks/blogMocks')
 const Blog = require('../models/blog')
 
 test('dummy returns one', () => {

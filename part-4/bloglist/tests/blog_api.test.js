@@ -7,8 +7,8 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
-const mocks = require('./mocks')
-const {initialBlogs, blogsInDb, getBlogs} = require("./mocks");
+const mocks = require('./mocks/blogMocks')
+const {initialBlogs, blogsInDb, getBlogs} = require("./mocks/blogMocks");
 
 // ======================================================
 // initialize app
@@ -123,7 +123,7 @@ describe('create blog', async () => {
 })
 
 describe('delete blog', async () => {
-  test.only('number of blog posts in database decreases by one', async () => {
+  test('number of blog posts in database decreases by one', async () => {
     // get ID of target blog to delete
     let blogsInDb = await getBlogs()
     const targetBlogId = blogsInDb[0].id
@@ -136,18 +136,18 @@ describe('delete blog', async () => {
     assert.strictEqual(blogsInDb.length, initialBlogs.length - 1)
   })
 
-  test.only('returns 400 when id is invalid', async () => {
+  test('returns 400 when id is invalid', async () => {
     await api.delete('/api/blogs/999').expect(400)
   })
 
-  test.only('returns 404 when no blog post of given id exists', async () => {
+  test('returns 404 when no blog post of given id exists', async () => {
     const randomId = "65dcdafe1234567890abcdef"
     await api.delete(`/api/blogs/${randomId}`).expect(404)
   })
 })
 
 describe('update blog', async () => {
-  test.only('returns status code 200 on success', async ()=>{
+  test('returns status code 200 on success', async ()=>{
     // get ID of target blog to delete
     let blogsInDb = await getBlogs()
     const targetBlogId = blogsInDb[0].id
@@ -165,7 +165,7 @@ describe('update blog', async () => {
       .expect(200)
   })
 
-  test.only('returns json of updated object on success', async ()=>{
+  test('returns json of updated object on success', async ()=>{
     // get ID of target blog to delete
     let blogsInDb = await getBlogs()
     const targetBlogId = blogsInDb[0].id
@@ -188,7 +188,7 @@ describe('update blog', async () => {
     assert.deepStrictEqual(updatedBlog, updateResult)
   })
 
-  test.only('target resource is updated', async ()=>{
+  test('target resource is updated', async ()=>{
     // get ID of target blog to delete
     let blogsInDb = await getBlogs()
     const targetBlogId = blogsInDb[0].id
@@ -217,7 +217,7 @@ describe('update blog', async () => {
     assert.deepStrictEqual(updatedBlog, updateResult)
   })
 
-  test.only('number of blog posts in database stays the same', async () => {
+  test('number of blog posts in database stays the same', async () => {
     // get ID of target blog to delete
     let blogsInDb = await getBlogs()
     const targetBlogId = blogsInDb[0].id
@@ -240,11 +240,11 @@ describe('update blog', async () => {
     assert.strictEqual(blogsInDb.length, initialBlogs.length)
   })
 
-  test.only('returns 400 when id is invalid', async () => {
+  test('returns 400 when id is invalid', async () => {
     await api.put('/api/blogs/999').expect(400)
   })
 
-  test.only('returns 404 when no blog post of given id exists', async () => {
+  test('returns 404 when no blog post of given id exists', async () => {
     const randomId = "65dcdafe1234567890abcdef"
     await api.put(`/api/blogs/${randomId}`).expect(404)
   })

@@ -6,13 +6,21 @@ const errors = require('../models/errors')
 // get all users
 usersRouter.get('/', async (request, response) => {
   const foundUsers = await User.find({})
-  response.json(foundUsers)
+  return response.json(foundUsers)
 })
 
 // create a user
 usersRouter.post('/', async (request, response) => {
   // parse body
   const { username, name, password } = request.body
+
+  // password validation
+  if(!password){
+    return response.status(400).json({error: 'Field "password" is required.'})
+  }
+  if(password.length < 3){
+    return response.status(400).json({error: "Password must be more than 3 characters."})
+  }
 
   // encrypt password
   const saltRounds = 10
@@ -25,7 +33,7 @@ usersRouter.post('/', async (request, response) => {
     passwordHash,
   })
   const savedUser = await user.save()
-  response.status(201).json(savedUser)
+  return response.status(201).json(savedUser)
 })
 
 module.exports = usersRouter
