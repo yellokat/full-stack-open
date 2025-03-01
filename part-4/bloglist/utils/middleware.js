@@ -1,4 +1,6 @@
 const logger = require('./logger')
+const jwt = require("jsonwebtoken")
+const User = require("../models/user")
 
 // request logger config
 const requestLogger = (request, response, next) => {
@@ -10,7 +12,7 @@ const requestLogger = (request, response, next) => {
 }
 
 const tokenExtractor = (request, response, next) => {
-  // code that extracts the token
+  // code that extracts JWT from header
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     request.token = authorization.replace('Bearer ', '')
@@ -18,8 +20,29 @@ const tokenExtractor = (request, response, next) => {
   next()
 }
 
+const userExtractor = async (request, response, next) => {
+  if (!request.token){
+    return response.status(401).json({error: 'token invalid - no jwt provided'})
+  }
+  // if token exists (if truthy)
+  if (request.token) {
+    // verify jwt
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({error: 'token invalid - incorrect signing'})
+    }
+    // set user field of request object
+    const foundUser = await User.findById(decodedToken.id)
+    if (!foundUser) {
+      return response.status(401).json({error: 'token invalid - no such user'})
+    }
+    request.user = foundUser
+  }
+  next()
+}
+
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({error: 'unknown endpoint'})
+  return response.status(404).send({error: 'unknown endpoint'})
 }
 
 const errorHandler = (error, request, response, next) => {
@@ -40,4 +63,4 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-module.exports = {requestLogger, errorHandler, unknownEndpoint, tokenExtractor}
+module.exports = {requestLogger, errorHandler, unknownEndpoint, tokenExtractor, userExtractor}
