@@ -35,7 +35,7 @@ const blogMock5 = {
 const initialBlogs = [blogMock1, blogMock2, blogMock3, blogMock4, blogMock5]
 
 const getBlogs = async () => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).populate('user', {username:1, name:1})
   return blogs.map(blog => blog.toJSON())
 }
 

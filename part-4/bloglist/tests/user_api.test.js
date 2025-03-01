@@ -56,6 +56,7 @@ describe("create user", () => {
     assert.strictEqual("passwordHash" in body, false)
     delete body.id
     delete newUserData.password
+    newUserData.blogs = []
     assert.deepStrictEqual(body, newUserData)
   })
 

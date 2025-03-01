@@ -7,8 +7,9 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
-const mocks = require('./mocks/blogMocks')
-const {initialBlogs, blogsInDb, getBlogs} = require("./mocks/blogMocks");
+const User = require('../models/user')
+const blogMocks = require('./mocks/blogMocks')
+const userMocks = require('./mocks/userMocks')
 
 // ======================================================
 // initialize app
@@ -21,9 +22,30 @@ const api = supertest(app)
 // ======================================================
 
 beforeEach(async () => {
+  // delete all blogs and users
   await Blog.deleteMany({})
+  await User.deleteMany({})
+  // save initial users
+  const initialUsers = await userMocks.getInitialUsers()
+  for (const initialUser of initialUsers) {
+    const createdUser = new User(initialUser)
+    await createdUser.save()
+  }
+  // save initial blogs
+  const randomUser = (await userMocks.getUsers())[0]
   await Promise.all(
-    initialBlogs.map(blog => new Blog(blog).save())
+    blogMocks.initialBlogs.map(async blog => {
+      const createdBlog = new Blog(blog)
+      // user <-> blog mapping
+      createdBlog.user = randomUser.id
+      // save both objects
+      await createdBlog.save()
+      await User.findByIdAndUpdate(
+        randomUser.id,
+        {$push: {blogs: createdBlog.id}},
+        {context: 'query'}
+      )
+    })
   )
 })
 
@@ -52,42 +74,90 @@ test('"id" is used instead of "_id" in server ("_id" is still used in database)'
 })
 
 describe('create blog', async () => {
-  test('creates blog in server and returns same json as created blog', async () => {
+  test('a Bearer token must be provided in header', async()=>{
     const newBlog = {
       title: "New Blog Post",
       author: "Seungwon Jang",
       url: "https://www.google.com",
       likes: 0
     }
-
-    // return is a JSON, status code 201
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
+      .expect(401)
+  })
+
+  test('creates blog in server and returns same json as created blog', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
+    // return is a JSON, status code 201
+    const newBlog = {
+      title: "New Blog Post",
+      author: "Seungwon Jang",
+      url: "https://www.google.com",
+      likes: 0
+    }
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
     // return value matches the added content
     const createdBlog = response.body
     delete createdBlog.id
+    delete createdBlog.user.id
+    newBlog.user = {
+      name: testName,
+      username: testUsername,
+    }
     assert.deepStrictEqual(createdBlog, newBlog)
 
     // number of blogposts in db has increased by one
-    const blogsInDb = await getBlogs()
-    assert.strictEqual(blogsInDb.length, initialBlogs.length + 1)
+    const blogsInDb = await blogMocks.getBlogs()
+    assert.strictEqual(blogsInDb.length, blogMocks.initialBlogs.length + 1)
   })
 
   test('default likes is 0', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
+    // return is a JSON, status code 201
     const newBlog = {
       title: "New Blog Post",
       author: "Seungwon Jang",
       url: "https://www.google.com"
     }
-
-    // return is a JSON, status code 201
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -95,61 +165,162 @@ describe('create blog', async () => {
     assert.strictEqual(response.body.likes, 0)
   })
 
-  test('"title" field is required', async ()=>{
+  test('"title" field is required', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
+    // returns status code 400
     const newBlog = {
       author: "Seungwon Jang",
       url: "https://www.google.com"
     }
-
-    // returns status code 400
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
   })
 
-  test('"url" field is required', async ()=>{
+  test('"url" field is required', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
+    // returns status code 400
     const newBlog = {
       title: "New Blog Post",
       author: "Seungwon Jang",
     }
-
-    // returns status code 400
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
   })
 })
 
 describe('delete blog', async () => {
   test('number of blog posts in database decreases by one', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
     // get ID of target blog to delete
-    let blogsInDb = await getBlogs()
+    let blogsInDb = await blogMocks.getBlogs()
     const targetBlogId = blogsInDb[0].id
 
     // perform deletion
-    await api.delete(`/api/blogs/${targetBlogId}`).expect(204)
+    await api
+      .delete(`/api/blogs/${targetBlogId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(204)
 
     // number of blog posts in database decreases by one
-    blogsInDb = await getBlogs()
-    assert.strictEqual(blogsInDb.length, initialBlogs.length - 1)
+    blogsInDb = await blogMocks.getBlogs()
+    assert.strictEqual(blogsInDb.length, blogMocks.initialBlogs.length - 1)
   })
 
   test('returns 400 when id is invalid', async () => {
-    await api.delete('/api/blogs/999').expect(400)
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
+    // perform deletion
+    await api
+      .delete('/api/blogs/999')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400)
   })
 
   test('returns 404 when no blog post of given id exists', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
+    // perform deletion
     const randomId = "65dcdafe1234567890abcdef"
-    await api.delete(`/api/blogs/${randomId}`).expect(404)
+    await api
+      .delete(`/api/blogs/${randomId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(404)
   })
 })
 
 describe('update blog', async () => {
-  test('returns status code 200 on success', async ()=>{
+  test('returns status code 200 on success', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
     // get ID of target blog to delete
-    let blogsInDb = await getBlogs()
+    let blogsInDb = await blogMocks.getBlogs()
     const targetBlogId = blogsInDb[0].id
 
     // perform update, should return 200
@@ -162,12 +333,28 @@ describe('update blog', async () => {
     await api
       .put(`/api/blogs/${targetBlogId}`)
       .send(updatedBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200)
   })
 
-  test('returns json of updated object on success', async ()=>{
+  test('returns json of updated object on success', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
     // get ID of target blog to delete
-    let blogsInDb = await getBlogs()
+    let blogsInDb = await blogMocks.getBlogs()
     const targetBlogId = blogsInDb[0].id
 
     // perform update, should return JSON
@@ -180,17 +367,38 @@ describe('update blog', async () => {
     const response = await api
       .put(`/api/blogs/${targetBlogId}`)
       .send(updatedBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect('Content-Type', /application\/json/)
 
     // returned json should be equal to update request data
     const updateResult = response.body
     delete updateResult.id
-    assert.deepStrictEqual(updatedBlog, updateResult)
+    delete updateResult.user.id
+    updatedBlog.user = {
+      name: testName,
+      username: testUsername,
+    }
+    assert.deepStrictEqual(updateResult, updatedBlog)
   })
 
-  test('target resource is updated', async ()=>{
+  test('target resource is updated', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
     // get ID of target blog to delete
-    let blogsInDb = await getBlogs()
+    let blogsInDb = await blogMocks.getBlogs()
     const targetBlogId = blogsInDb[0].id
 
     // perform update
@@ -203,23 +411,44 @@ describe('update blog', async () => {
     await api
       .put(`/api/blogs/${targetBlogId}`)
       .send(updatedBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
     // fetch updated object from database
-    blogsInDb = await getBlogs()
+    blogsInDb = await blogMocks.getBlogs()
     const filteredBlogs = blogsInDb.filter(blog => (blog.id === targetBlogId))
     assert.strictEqual(filteredBlogs.length, 1)
 
     // data of object fetched from database should match data of update request
     const updateResult = filteredBlogs[0]
     delete updateResult.id
-    assert.deepStrictEqual(updatedBlog, updateResult)
+    delete updateResult.user.id
+    updatedBlog.user = {
+      name: testName,
+      username: testUsername,
+    }
+    assert.deepStrictEqual(updateResult, updatedBlog)
   })
 
   test('number of blog posts in database stays the same', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
     // get ID of target blog to delete
-    let blogsInDb = await getBlogs()
+    let blogsInDb = await blogMocks.getBlogs()
     const targetBlogId = blogsInDb[0].id
 
     // perform update
@@ -232,21 +461,58 @@ describe('update blog', async () => {
     await api
       .put(`/api/blogs/${targetBlogId}`)
       .send(updatedBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
     // number of blog posts in database decreases by one
-    blogsInDb = await getBlogs()
-    assert.strictEqual(blogsInDb.length, initialBlogs.length)
+    blogsInDb = await blogMocks.getBlogs()
+    assert.strictEqual(blogsInDb.length, blogMocks.initialBlogs.length)
   })
 
   test('returns 400 when id is invalid', async () => {
-    await api.put('/api/blogs/999').expect(400)
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
+    await api
+      .put('/api/blogs/999')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400)
   })
 
   test('returns 404 when no blog post of given id exists', async () => {
+    // login as a user
+    const testUsername = "tester1"
+    const testPassword = "tester1"
+    const testName = "tester1name"
+    const loginBody = {
+      username: testUsername,
+      password: testPassword
+    }
+    const loginResponse = await api
+      .post('/api/login')
+      .send(loginBody)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const token = loginResponse.body.token
+
     const randomId = "65dcdafe1234567890abcdef"
-    await api.put(`/api/blogs/${randomId}`).expect(404)
+    await api
+      .put(`/api/blogs/${randomId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(404)
   })
 })
 
