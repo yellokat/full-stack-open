@@ -118,7 +118,7 @@ const App = () => {
         </button>
       </p>
       <Togglable buttonLabel='create new' ref={createBlogFormRef}>
-        <CreateBlogForm onSuccess={onSuccess} onError={onError}/>
+        <CreateBlogForm handleCreateBlog={handleCreateBlog}/>
       </Togglable>
       <br/>
       {blogs.map(blog =>
@@ -167,13 +167,25 @@ const App = () => {
     }
   }
 
+  const handleCreateBlog = async ({ title, author, url }) => {
+    try {
+      createBlogFormRef.current.toggleVisibility()
+      const blog = await blogService.create({
+        title, author, url
+      })
+      // display notification
+      await onSuccess({ title, author, blog })
+    } catch (exception) {
+      onError({ exception })
+    }
+  }
+
   const onSuccess = async ({ title, author, blog }) => {
     await setSuccessMessage(`new blog post added : [${title}] by ${author}`)
     setTimeout(() => {
       setSuccessMessage(null)
     }, 5000)
     appendToLocalBlogList({ blog })
-    createBlogFormRef.current.toggleVisibility()
   }
 
   const onError = ({ exception }) => {
