@@ -118,11 +118,11 @@ const App = () => {
         </button>
       </p>
       <Togglable buttonLabel='create new' ref={createBlogFormRef}>
-        <CreateBlogForm onSuccess={onSuccess} onError={onError} />
+        <CreateBlogForm onSuccess={onSuccess} onError={onError}/>
       </Togglable>
       <br/>
       {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog}/>
+          <Blog key={blog.id} blog={blog} onUpdate={updateLocalBlogList}/>
         // TODO : blog list here
       )}
     </div>
@@ -130,7 +130,7 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs => {
-        setBlogs(blogs)
+        setBlogs(blogs.sort((a, b) => b.likes - a.likes))
       }
     )
   }, [])
@@ -139,8 +139,19 @@ const App = () => {
   // create blog callback functions
   // ========================================================
 
-  const appendBlog = ({blog}) => {
+  const appendToLocalBlogList = ({blog}) => {
     setBlogs([...blogs, blog])
+  }
+
+  const updateLocalBlogList = ({updatedBlog}) => {
+    console.log('hello')
+    const updatedBlogs = [...blogs].map((blog) => {
+      if (blog.id === updatedBlog.id) {
+        return updatedBlog
+      }
+      return blog
+    })
+    setBlogs(updatedBlogs.sort((a, b) => b.likes - a.likes))
   }
 
   const onSuccess = async ({title, author, blog}) => {
@@ -148,11 +159,11 @@ const App = () => {
     setTimeout(() => {
       setSuccessMessage(null)
     }, 5000)
-    appendBlog({blog})
+    appendToLocalBlogList({blog})
     createBlogFormRef.current.toggleVisibility()
   }
 
-  const onError = ({ exception })=>{
+  const onError = ({exception}) => {
     // display notification
     setErrorMessage(exception.toString())
     setTimeout(() => {

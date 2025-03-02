@@ -1,7 +1,8 @@
 import {useState} from "react";
+import blogService from "../services/blogs"
 
-const Blog = ({blog}) => {
-  const [expanded, setExpanded] = useState(false)
+const Blog = ({blog, onUpdate}) => {
+  const [expanded, setExpanded] = useState(true)
 
   const blogStyle = {
     paddingTop: 10,
@@ -19,8 +20,12 @@ const Blog = ({blog}) => {
         <br/>
         {blog.url}
         <br/>
-        {blog.likes}
-        <button onClick={() => {
+        likes {blog.likes}
+        <button onClick={async () => {
+          const updatedBlog = await blogService.update(blog.id, {
+            likes: blog.likes + 1
+          })
+          onUpdate({updatedBlog})
         }}>like
         </button>
         <br/>
