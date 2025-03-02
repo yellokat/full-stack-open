@@ -7,6 +7,7 @@ import loginService from './services/login'
 import ErrorMessage from "./components/errorMessage.jsx";
 import SuccessMessage from "./components/successMessage.jsx";
 import Togglable from "./components/Togglable.jsx";
+import CreateBlogForm from "./components/createBlogForm.jsx";
 
 const App = () => {
   // login form
@@ -16,10 +17,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   // blog list
   const [blogs, setBlogs] = useState([])
-  // create blog form
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   // notifications
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
@@ -106,7 +103,7 @@ const App = () => {
   }, [])
 
   // ========================================================
-  // blog functionality
+  // blog list section
   // ========================================================
 
   const blogListSection = () => (
@@ -121,7 +118,7 @@ const App = () => {
         </button>
       </p>
       <Togglable buttonLabel='create new' ref={createBlogFormRef}>
-        {createBlogSection()}
+        <CreateBlogForm onSuccess={onSuccess} onError={onError} />
       </Togglable>
       <br/>
       {blogs.map(blog =>
@@ -139,70 +136,29 @@ const App = () => {
   }, [])
 
   // ========================================================
-  // create blog post form
+  // create blog callback functions
   // ========================================================
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault()
-    try {
-      const blog = await blogService.create({
-        title, author, url
-      })
-      // display notification
-      setSuccessMessage(`new blog post added : [${title}] by ${author}`)
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
-      // reset form
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      setBlogs([...blogs, blog])
-      createBlogFormRef.current.toggleVisibility()
-    } catch (exception) {
-      // display notification
-      setErrorMessage(exception.toString())
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    }
+  const appendBlog = ({blog}) => {
+    setBlogs([...blogs, blog])
   }
 
-  const createBlogSection = () => (
-    <div>
-      <h2>Create new</h2>
-      <form onSubmit={handleCreateBlog}>
-        <div>
-          title:
-          <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({target}) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author:
-          <input
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({target}) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url:
-          <input
-            type="text"
-            value={url}
-            name="Url"
-            onChange={({target}) => setUrl(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
-  )
+  const onSuccess = async ({title, author, blog}) => {
+    await setSuccessMessage(`new blog post added : [${title}] by ${author}`)
+    setTimeout(() => {
+      setSuccessMessage(null)
+    }, 5000)
+    appendBlog({blog})
+    createBlogFormRef.current.toggleVisibility()
+  }
+
+  const onError = ({ exception })=>{
+    // display notification
+    setErrorMessage(exception.toString())
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
+  }
 
   // root widget
   return (
