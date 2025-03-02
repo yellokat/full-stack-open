@@ -22,10 +22,7 @@ const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
         <br/>
         likes {blog.likes}
         <button onClick={async () => {
-          const updatedBlog = await blogService.update(blog.id, {
-            likes: blog.likes + 1
-          })
-          onUpdate({ updatedBlog })
+          onUpdate({ id:blog.id, updatedLikes:blog.likes+1 })
         }}>like
         </button>
         <br/>
@@ -33,10 +30,7 @@ const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
         <br/>
         {blog.author === currentUser.name ?
           <button onClick={async () => {
-            if (window.confirm(`Really delete ${blog.title} by ${blog.author}?`)) {
-              await blogService.remove(blog.id)
-              onRemove({ id: blog.id })
-            }
+            onRemove({ targetBlog:blog })
           }}>delete
           </button> : null
         }

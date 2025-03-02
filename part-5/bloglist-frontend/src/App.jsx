@@ -125,9 +125,8 @@ const App = () => {
         <Blog key={blog.id}
           currentUser={user}
           blog={blog}
-          onUpdate={updateLocalBlogList}
-          onRemove={removeFromLocalBlogList}/>
-        // TODO : blog list here
+          onUpdate={onUpdate}
+          onRemove={onRemove}/>
       )}
     </div>
   )
@@ -147,7 +146,10 @@ const App = () => {
     setBlogs([...blogs, blog])
   }
 
-  const updateLocalBlogList = ({ updatedBlog }) => {
+  const onUpdate = async ({ id, updatedLikes }) => {
+    const updatedBlog = await blogService.update(id, {
+      likes: updatedLikes
+    })
     const updatedBlogs = [...blogs].map((blog) => {
       if (blog.id === updatedBlog.id) {
         return updatedBlog
@@ -157,9 +159,12 @@ const App = () => {
     setBlogs(updatedBlogs.sort((a, b) => b.likes - a.likes))
   }
 
-  const removeFromLocalBlogList = ({ id }) => {
-    const updatedBlogs = [...blogs].filter((blog) => (blog.id !== id))
-    setBlogs(updatedBlogs)
+  const onRemove = async ({ targetBlog }) => {
+    if (window.confirm(`Really delete ${targetBlog.title} by ${targetBlog.author}?`)) {
+      await blogService.remove(targetBlog.id)
+      const updatedBlogs = [...blogs].filter((blogEntry) => (blogEntry.id !== targetBlog.id))
+      setBlogs(updatedBlogs)
+    }
   }
 
   const onSuccess = async ({ title, author, blog }) => {

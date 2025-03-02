@@ -1,15 +1,16 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
-test('by default, title & author is found, url & likes is not', async () => {
-  const blog = {
+test('by default, title & author is found, url & likes is not.', () => {
+  const testBlogData = {
     'title': 'test title',
     'author': 'test author',
     'url': 'test url',
     'likes': 98765
   }
 
-  const user = {
+  const testUserData = {
     'username': 'testusername',
     'user': 'testuser'
   }
@@ -17,20 +18,56 @@ test('by default, title & author is found, url & likes is not', async () => {
   const mockOnUpdateHandler = vi.fn()
   const mockOnDeleteHandler = vi.fn()
 
-  const { container } = render(<Blog blog={blog}
-    currentUser={user}
+  const { container } = render(<Blog blog={testBlogData}
+    currentUser={testUserData}
     onUpdate={mockOnUpdateHandler}
     onRemove={mockOnDeleteHandler}/>)
 
-  screen.debug()
-
   const titleElement = screen.queryByText('test title')
   const authorElement = screen.queryByText('test author')
-  const urlElement = await screen.queryByText('test url')
-  const likesElement = await screen.queryByText('98765')
+  const urlElement = screen.queryByText('test url')
+  const likesElement = screen.queryByText('98765')
 
   expect(titleElement).toBeDefined()
   expect(authorElement).toBeDefined()
   expect(urlElement).toBeNull()
   expect(likesElement).toBeNull()
 })
+
+test('when blog component is expanded, url & likes are also visible.', async () => {
+  const testBlogData = {
+    'title': 'test title',
+    'author': 'test author',
+    'url': 'test url',
+    'likes': 98765
+  }
+
+  const testUserData = {
+    'username': 'testusername',
+    'user': 'testuser'
+  }
+
+  const mockOnUpdateHandler = vi.fn()
+  const mockOnDeleteHandler = vi.fn()
+
+  const { container } = render(<Blog blog={testBlogData}
+    currentUser={testUserData}
+    onUpdate={mockOnUpdateHandler}
+    onRemove={mockOnDeleteHandler}/>)
+
+  // click on button to expand content
+  const user = userEvent.setup()
+  const button = screen.getByText('view')
+  await user.click(button)
+
+  const titleElement = screen.queryByText('test title')
+  const authorElement = screen.queryByText('test author')
+  const urlElement = screen.queryByText('test url')
+  const likesElement = screen.queryByText('98765')
+
+  expect(titleElement).toBeDefined()
+  expect(authorElement).toBeDefined()
+  expect(urlElement).toBeDefined()
+  expect(likesElement).toBeDefined()
+})
+
