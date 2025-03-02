@@ -1,11 +1,12 @@
 // noinspection DuplicatedCode
 
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import ErrorMessage from "./components/errorMessage.jsx";
 import SuccessMessage from "./components/successMessage.jsx";
+import Togglable from "./components/Togglable.jsx";
 
 const App = () => {
   // login form
@@ -22,6 +23,8 @@ const App = () => {
   // notifications
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
+  // create blog visibility ref
+  const createBlogFormRef = useRef();
 
   // ========================================================
   // login functionality
@@ -117,7 +120,9 @@ const App = () => {
           logout
         </button>
       </p>
-      {createBlogSection()}
+      <Togglable buttonLabel='create new' ref={createBlogFormRef}>
+        {createBlogSection()}
+      </Togglable>
       <br/>
       {blogs.map(blog =>
           <Blog key={blog.id} blog={blog}/>
@@ -153,7 +158,7 @@ const App = () => {
       setAuthor('')
       setUrl('')
       setBlogs([...blogs, blog])
-
+      createBlogFormRef.current.toggleVisibility()
     } catch (exception) {
       // display notification
       setErrorMessage(exception.toString())
