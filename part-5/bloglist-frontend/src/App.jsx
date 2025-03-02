@@ -122,7 +122,11 @@ const App = () => {
       </Togglable>
       <br/>
       {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} onUpdate={updateLocalBlogList}/>
+          <Blog key={blog.id}
+                currentUser={user}
+                blog={blog}
+                onUpdate={updateLocalBlogList}
+                onRemove={removeFromLocalBlogList}/>
         // TODO : blog list here
       )}
     </div>
@@ -144,7 +148,6 @@ const App = () => {
   }
 
   const updateLocalBlogList = ({updatedBlog}) => {
-    console.log('hello')
     const updatedBlogs = [...blogs].map((blog) => {
       if (blog.id === updatedBlog.id) {
         return updatedBlog
@@ -152,6 +155,11 @@ const App = () => {
       return blog
     })
     setBlogs(updatedBlogs.sort((a, b) => b.likes - a.likes))
+  }
+
+  const removeFromLocalBlogList = ({id}) => {
+    const updatedBlogs = [...blogs].filter((blog) => (blog.id !== id))
+    setBlogs(updatedBlogs)
   }
 
   const onSuccess = async ({title, author, blog}) => {
