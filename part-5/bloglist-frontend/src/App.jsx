@@ -1,15 +1,27 @@
+// noinspection DuplicatedCode
+
 import {useState, useEffect} from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import Notification from './components/Notification'
+import ErrorMessage from "./components/errorMessage.jsx";
+import SuccessMessage from "./components/successMessage.jsx";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
+  // login form
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  // active login user
   const [user, setUser] = useState(null)
+  // blog list
+  const [blogs, setBlogs] = useState([])
+  // create blog form
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+  // notifications
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
 
   // ========================================================
   // login functionality
@@ -34,7 +46,13 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      // display notification
+      setSuccessMessage(`logged in as ${user.name}`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
     } catch (exception) {
+      // display notification
       setErrorMessage('wrong credentials')
       setTimeout(() => {
         setErrorMessage(null)
@@ -45,7 +63,8 @@ const App = () => {
   const loginSection = () => (
     <div>
       <h2>Log in to application</h2>
-      <Notification message={errorMessage}/>
+      {(errorMessage) ? <ErrorMessage message={errorMessage}/> : null}
+      {(successMessage) ? <SuccessMessage message={successMessage}/> : null}
       <form onSubmit={handleLogin}>
         <div>
           username
@@ -89,6 +108,8 @@ const App = () => {
 
   const blogListSection = () => (
     <div>
+      {(errorMessage) ? <ErrorMessage message={errorMessage}/> : null}
+      {(successMessage) ? <SuccessMessage message={successMessage}/> : null}
       <h2>blogs</h2>
       <p>
         {user.name} logged in
@@ -96,6 +117,8 @@ const App = () => {
           logout
         </button>
       </p>
+      {createBlogSection()}
+      <br/>
       {blogs.map(blog =>
           <Blog key={blog.id} blog={blog}/>
         // TODO : blog list here
@@ -109,6 +132,72 @@ const App = () => {
       }
     )
   }, [])
+
+  // ========================================================
+  // create blog post form
+  // ========================================================
+
+  const handleCreateBlog = async (event) => {
+    event.preventDefault()
+    try {
+      const blog = await blogService.create({
+        title, author, url
+      })
+      // display notification
+      setSuccessMessage(`new blog post added : [${title}] by ${author}`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
+      // reset form
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      setBlogs([...blogs, blog])
+
+    } catch (exception) {
+      // display notification
+      setErrorMessage(exception.toString())
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const createBlogSection = () => (
+    <div>
+      <h2>Create new</h2>
+      <form onSubmit={handleCreateBlog}>
+        <div>
+          title:
+          <input
+            type="text"
+            value={title}
+            name="Title"
+            onChange={({target}) => setTitle(target.value)}
+          />
+        </div>
+        <div>
+          author:
+          <input
+            type="text"
+            value={author}
+            name="Author"
+            onChange={({target}) => setAuthor(target.value)}
+          />
+        </div>
+        <div>
+          url:
+          <input
+            type="text"
+            value={url}
+            name="Url"
+            onChange={({target}) => setUrl(target.value)}
+          />
+        </div>
+        <button type="submit">create</button>
+      </form>
+    </div>
+  )
 
   // root widget
   return (
