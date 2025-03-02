@@ -11,7 +11,8 @@ function CreateBlogForm({ handleCreateBlog }) {
     <div>
       <h2>Create new</h2>
       <form onSubmit={(event) => {
-        handleCreateBlog({ event, title, author, url })
+        event.preventDefault()
+        handleCreateBlog({ title, author, url })
         setTitle('')
         setAuthor('')
         setUrl('')

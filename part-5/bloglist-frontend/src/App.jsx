@@ -167,8 +167,7 @@ const App = () => {
     }
   }
 
-  const handleCreateBlog = async ({ event, title, author, url }) => {
-    event.preventDefault()
+  const handleCreateBlog = async ({ title, author, url }) => {
     try {
       createBlogFormRef.current.toggleVisibility()
       const blog = await blogService.create({
