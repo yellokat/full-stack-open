@@ -1,7 +1,7 @@
-import {useState} from "react";
-import blogService from "../services/blogs"
+import { useState } from 'react'
+import blogService from '../services/blogs'
 
-const Blog = ({blog, currentUser, onUpdate, onRemove}) => {
+const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
   const [expanded, setExpanded] = useState(true)
 
   const blogStyle = {
@@ -25,7 +25,7 @@ const Blog = ({blog, currentUser, onUpdate, onRemove}) => {
           const updatedBlog = await blogService.update(blog.id, {
             likes: blog.likes + 1
           })
-          onUpdate({updatedBlog})
+          onUpdate({ updatedBlog })
         }}>like
         </button>
         <br/>
@@ -35,7 +35,7 @@ const Blog = ({blog, currentUser, onUpdate, onRemove}) => {
           <button onClick={async () => {
             if (window.confirm(`Really delete ${blog.title} by ${blog.author}?`)) {
               await blogService.remove(blog.id)
-              onRemove({id: blog.id})
+              onRemove({ id: blog.id })
             }
           }}>delete
           </button> : null

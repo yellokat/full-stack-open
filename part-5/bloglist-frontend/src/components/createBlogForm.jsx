@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import blogService from "../services/blogs.js";
+import React, { useState } from 'react'
+import blogService from '../services/blogs.js'
 
-function CreateBlogForm({onSuccess, onError}) {
+function CreateBlogForm({ onSuccess, onError }) {
   // create blog form
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -14,13 +14,13 @@ function CreateBlogForm({onSuccess, onError}) {
         title, author, url
       })
       // display notification
-      await onSuccess({title, author, blog})
+      await onSuccess({ title, author, blog })
       // reset form
       setTitle('')
       setAuthor('')
       setUrl('')
     } catch (exception) {
-      onError({exception})
+      onError({ exception })
     }
   }
 
@@ -34,7 +34,7 @@ function CreateBlogForm({onSuccess, onError}) {
             type="text"
             value={title}
             name="Title"
-            onChange={({target}) => setTitle(target.value)}
+            onChange={({ target }) => setTitle(target.value)}
           />
         </div>
         <div>
@@ -43,7 +43,7 @@ function CreateBlogForm({onSuccess, onError}) {
             type="text"
             value={author}
             name="Author"
-            onChange={({target}) => setAuthor(target.value)}
+            onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>
@@ -52,13 +52,13 @@ function CreateBlogForm({onSuccess, onError}) {
             type="text"
             value={url}
             name="Url"
-            onChange={({target}) => setUrl(target.value)}
+            onChange={({ target }) => setUrl(target.value)}
           />
         </div>
         <button type="submit">create</button>
       </form>
     </div>
-  );
+  )
 }
 
-export default CreateBlogForm;
+export default CreateBlogForm

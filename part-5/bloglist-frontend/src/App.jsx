@@ -1,13 +1,13 @@
 // noinspection DuplicatedCode
 
-import {useState, useEffect, useRef} from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import ErrorMessage from "./components/errorMessage.jsx";
-import SuccessMessage from "./components/successMessage.jsx";
-import Togglable from "./components/Togglable.jsx";
-import CreateBlogForm from "./components/createBlogForm.jsx";
+import ErrorMessage from './components/errorMessage.jsx'
+import SuccessMessage from './components/successMessage.jsx'
+import Togglable from './components/Togglable.jsx'
+import CreateBlogForm from './components/createBlogForm.jsx'
 
 const App = () => {
   // login form
@@ -21,7 +21,7 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   // create blog visibility ref
-  const createBlogFormRef = useRef();
+  const createBlogFormRef = useRef()
 
   // ========================================================
   // login functionality
@@ -72,7 +72,7 @@ const App = () => {
             type="text"
             value={username}
             name="Username"
-            onChange={({target}) => setUsername(target.value)}
+            onChange={({ target }) => setUsername(target.value)}
           />
         </div>
         <div>
@@ -81,7 +81,7 @@ const App = () => {
             type="password"
             value={password}
             name="Password"
-            onChange={({target}) => setPassword(target.value)}
+            onChange={({ target }) => setPassword(target.value)}
           />
         </div>
         <button type="submit">login</button>
@@ -122,11 +122,11 @@ const App = () => {
       </Togglable>
       <br/>
       {blogs.map(blog =>
-          <Blog key={blog.id}
-                currentUser={user}
-                blog={blog}
-                onUpdate={updateLocalBlogList}
-                onRemove={removeFromLocalBlogList}/>
+        <Blog key={blog.id}
+          currentUser={user}
+          blog={blog}
+          onUpdate={updateLocalBlogList}
+          onRemove={removeFromLocalBlogList}/>
         // TODO : blog list here
       )}
     </div>
@@ -134,8 +134,8 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs => {
-        setBlogs(blogs.sort((a, b) => b.likes - a.likes))
-      }
+      setBlogs(blogs.sort((a, b) => b.likes - a.likes))
+    }
     )
   }, [])
 
@@ -143,11 +143,11 @@ const App = () => {
   // create blog callback functions
   // ========================================================
 
-  const appendToLocalBlogList = ({blog}) => {
+  const appendToLocalBlogList = ({ blog }) => {
     setBlogs([...blogs, blog])
   }
 
-  const updateLocalBlogList = ({updatedBlog}) => {
+  const updateLocalBlogList = ({ updatedBlog }) => {
     const updatedBlogs = [...blogs].map((blog) => {
       if (blog.id === updatedBlog.id) {
         return updatedBlog
@@ -157,21 +157,21 @@ const App = () => {
     setBlogs(updatedBlogs.sort((a, b) => b.likes - a.likes))
   }
 
-  const removeFromLocalBlogList = ({id}) => {
+  const removeFromLocalBlogList = ({ id }) => {
     const updatedBlogs = [...blogs].filter((blog) => (blog.id !== id))
     setBlogs(updatedBlogs)
   }
 
-  const onSuccess = async ({title, author, blog}) => {
+  const onSuccess = async ({ title, author, blog }) => {
     await setSuccessMessage(`new blog post added : [${title}] by ${author}`)
     setTimeout(() => {
       setSuccessMessage(null)
     }, 5000)
-    appendToLocalBlogList({blog})
+    appendToLocalBlogList({ blog })
     createBlogFormRef.current.toggleVisibility()
   }
 
-  const onError = ({exception}) => {
+  const onError = ({ exception }) => {
     // display notification
     setErrorMessage(exception.toString())
     setTimeout(() => {
