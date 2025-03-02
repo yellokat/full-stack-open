@@ -1,33 +1,21 @@
 import React, { useState } from 'react'
 import blogService from '../services/blogs.js'
 
-function CreateBlogForm({ onSuccess, onError }) {
+function CreateBlogForm({ handleCreateBlog }) {
   // create blog form
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault()
-    try {
-      const blog = await blogService.create({
-        title, author, url
-      })
-      // display notification
-      await onSuccess({ title, author, blog })
-      // reset form
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-    } catch (exception) {
-      onError({ exception })
-    }
-  }
-
   return (
     <div>
       <h2>Create new</h2>
-      <form onSubmit={handleCreateBlog}>
+      <form onSubmit={(event) => {
+        handleCreateBlog({ event, title, author, url })
+        setTitle('')
+        setAuthor('')
+        setUrl('')
+      }}>
         <div>
           title:
           <input
