@@ -128,11 +128,11 @@ describe('Blog app', () => {
       likesText = await page.getByText('likes', {exact: false}).textContent()
       match = likesText.match(/likes (\d+)/);
       const updatedLikes = parseInt(match[1], 10)
-      expect(updatedLikes).toBe(prevLikes + 1)
+      expect(updatedLikes).toStrictEqual(prevLikes + 1)
     })
   })
 
-  describe.only('when logged in & one blog post exists for each user', async () => {
+  describe('when logged in & one blog post exists for each user', async () => {
     beforeEach(async ({page}) => {
       // login as user 2
       await page.getByRole('textbox', {name: 'Username'}).fill("username2")
@@ -187,8 +187,8 @@ describe('Blog app', () => {
       await expect(viewButtons).toHaveLength(2)
       await expect(viewButtons[0]).toBeVisible()
       await expect(viewButtons[1]).toBeVisible()
-      await page.getByRole('button', {name:'view'}).nth(0).click()
-      await page.getByRole('button', {name:'view'}).nth(0).click()
+      await page.getByRole('button', {name: 'view'}).nth(0).click()
+      await page.getByRole('button', {name: 'view'}).nth(0).click()
 
       // only one delete button should be visible
       const deleteButton = await page.getByRole('button', {name: 'delete'})
@@ -206,12 +206,64 @@ describe('Blog app', () => {
       const viewButtons = await page.getByRole('button', {name: 'view'}).all()
       await expect(viewButtons[0]).toBeVisible()
       await expect(viewButtons[1]).toBeVisible()
-      await page.getByRole('button', {name:'view'}).nth(0).click()
-      await page.getByRole('button', {name:'view'}).nth(0).click()
+      await page.getByRole('button', {name: 'view'}).nth(0).click()
+      await page.getByRole('button', {name: 'view'}).nth(0).click()
 
       // only one delete button should be visible
       const deleteButtons = await page.getByRole('button', {name: 'delete'}).all()
       expect(deleteButtons).toHaveLength(1)
+    })
+  })
+
+  describe('When logged in & 5 blog posts exist', () => {
+    beforeEach(async ({page}) => {
+      // login
+      await page.getByRole('textbox', {name: 'Username'}).fill("username1")
+      await page.getByRole('textbox', {name: 'Password'}).fill("password1")
+      await page.getByText('login').click()
+
+      // create 5 blog posts
+      for (let i = 1; i <= 5; i++) {
+        let createButton = page.getByRole('button', {name: 'create new'})
+        await createButton.click()
+        const textFields = await page.getByRole('textbox').all()
+        await textFields[0].fill(`new title ${i}`)
+        await textFields[1].fill(`new author ${i}`)
+        await textFields[2].fill(`new url ${i}`)
+        const submitButton = await page.getByRole('button', {name: 'create'})
+        await submitButton.click()
+        await page.waitForTimeout(2000);
+      }
+    })
+
+    test('blog posts are sorted by likes', async ({page}) => {
+      // locate and click all 5 blogs
+      for (let i = 1; i <= 5; i++) {
+        await page.getByRole('button', {name: 'view'}).nth(0).click()
+      }
+
+      // randomly like posts 10 times
+      let randomNumber
+      for (let i = 1; i <= 10; i++) {
+        randomNumber = Math.floor(Math.random() * 5);
+        await page.getByRole('button', {name: 'like'}).nth(randomNumber).click()
+        await page.waitForTimeout(2000);
+      }
+
+      // verify that posts are sorted by likes
+      let likesTexts = await page.getByText('likes', {exact: false}).all()
+      const observedLikes = await Promise.all(
+        likesTexts.map(async likesText => {
+          const txt = await likesText.textContent()
+          let match = txt.match(/likes (\d+)/)
+          return match[1]
+        })
+      )
+      console.log(`observed likes is ${observedLikes}`)
+      const sortedLikes = [...observedLikes]
+      sortedLikes.sort((a, b) => b - a)
+      console.log(`sorted likes is ${sortedLikes}`)
+      expect(sortedLikes).toStrictEqual(observedLikes)
     })
   })
 })
