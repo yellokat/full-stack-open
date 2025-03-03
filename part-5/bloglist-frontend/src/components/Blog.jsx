@@ -28,7 +28,7 @@ const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
         <br/>
         {blog.author}
         <br/>
-        {blog.author === currentUser.name ?
+        {blog.user.username === currentUser.username ?
           <button onClick={async () => {
             onRemove({ targetBlog:blog })
           }}>delete
