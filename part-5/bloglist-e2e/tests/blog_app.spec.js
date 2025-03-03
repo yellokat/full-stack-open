@@ -81,4 +81,47 @@ describe('Blog app', () => {
       await expect(createdBlog).toBeVisible()
     })
   })
+
+  describe('When logged in & a blog post exists', () => {
+    beforeEach(async ({page}) => {
+      // login
+      await page.getByRole('textbox', {name: 'Username'}).fill("username1")
+      await page.getByRole('textbox', {name: 'Password'}).fill("password1")
+      await page.getByText('login').click()
+
+      // create a blog post
+      const createButton = page.getByRole('button', {name:'create new'})
+      await createButton.click()
+      const textFields = await page.getByRole('textbox').all()
+      await textFields[0].fill('new title')
+      await textFields[1].fill('new author')
+      await textFields[2].fill('new url')
+      const submitButton = await page.getByRole('button', {name:'create'})
+      await submitButton.click()
+    })
+
+    test('a blog post can be liked', async ({page}) => {
+      // locate and click expand blog button
+      const viewButton = page.getByRole('button', {name:'view'})
+      await expect(viewButton).toBeVisible()
+      await viewButton.click()
+
+      // get current number of likes
+      let likesText = await page.getByText('likes', {exact: false}).textContent()
+      let match = likesText.match(/likes (\d+)/);
+      const prevLikes = parseInt(match[1], 10)
+
+      // locate and click like button
+      const likeButton = page.getByRole('button', {name:'like'})
+      await expect(likeButton).toBeVisible()
+      await likeButton.click()
+      await page.waitForTimeout(2000); // Wait for 2 seconds
+
+      // check that number of likes increases by 1
+      likesText = await page.getByText('likes', {exact: false}).textContent()
+      match = likesText.match(/likes (\d+)/);
+      const updatedLikes = parseInt(match[1], 10)
+      expect(updatedLikes).toBe(prevLikes+1)
+    })
+  })
 })
