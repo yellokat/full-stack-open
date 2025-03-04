@@ -31,6 +31,8 @@ const reducer = (state = initialState, action) => {
       }
       return anecdoteObject
     })
+  } else if (action.type === "CREATE"){
+    return [...state, asObject(action.payload.content)]
   }
   return state
 }
@@ -40,6 +42,15 @@ export const voteActionCreator = (id) => {
     type:"VOTE",
     payload:{
       id:id
+    }
+  }
+}
+
+export const createActionCreator = (content) => {
+  return {
+    type:"CREATE",
+    payload:{
+      content:content
     }
   }
 }
