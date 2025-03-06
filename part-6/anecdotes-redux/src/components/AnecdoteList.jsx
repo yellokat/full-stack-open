@@ -1,5 +1,4 @@
 import {useDispatch, useSelector} from "react-redux";
-import {voteActionCreator} from "../reducers/anecdoteReducer.js";
 
 function AnecdoteList() {
 
@@ -9,13 +8,13 @@ function AnecdoteList() {
 
   const handleVote = ({event, id}) => {
     event.preventDefault()
-    dispatch(voteActionCreator(id))
+    dispatch({type:"anecdote/vote", payload:id})
   }
 
   return (
     <div>
       {anecdotes.filter(
-        anecdote => anecdote.content.includes(filter)
+        anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase())
       ).map(anecdote =>
         <div key={anecdote.id}>
           <div>

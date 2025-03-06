@@ -1,5 +1,4 @@
 import {useDispatch} from "react-redux";
-import {setFilterActionCreator} from "../reducers/filterReducer.js";
 
 function AnecdoteFilter() {
   const dispatch = useDispatch()
@@ -7,7 +6,10 @@ function AnecdoteFilter() {
   const handleChange = (event) => {
     event.preventDefault();
     const filterString = event.target.value
-    dispatch(setFilterActionCreator(filterString))
+    dispatch({
+      type:'filter/setFilter',
+      payload: filterString
+    })
   }
 
   const style = {

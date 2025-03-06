@@ -1,6 +1,4 @@
 import {useDispatch} from "react-redux";
-import {createActionCreator} from "../reducers/anecdoteReducer.js";
-
 
 function AnecdoteForm() {
   const dispatch = useDispatch()
@@ -8,7 +6,7 @@ function AnecdoteForm() {
   const handleCreate = (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
-    dispatch(createActionCreator(content))
+    dispatch({type: "anecdote/create", payload: content})
   }
 
   return (
