@@ -1,4 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {useDispatch} from "react-redux";
 
 const initialAnecdotes = [
   'If it hurts, do it more often',
@@ -27,6 +28,7 @@ const anecdoteSlice = createSlice({
       const anecdote = state.find(a => a.id === action.payload);
       anecdote.votes += 1;
       state.sort((a, b) => b.votes - a.votes);
+
     },
     create(state, action){
       // mutating object directly, no return needed (thanks to immer)

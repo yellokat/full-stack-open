@@ -6,9 +6,13 @@ function AnecdoteList() {
   const filter = useSelector(state => state.filter)
   const dispatch = useDispatch()
 
-  const handleVote = ({event, id}) => {
+  const handleVote = ({event, id, content}) => {
     event.preventDefault()
     dispatch({type:"anecdote/vote", payload:id})
+    dispatch({type: "notification/set", payload: `You upvoted anecdote "${content}".` })
+    setTimeout(() => {
+      dispatch({type: "notification/remove"})
+    }, 5000)
   }
 
   return (
@@ -23,7 +27,7 @@ function AnecdoteList() {
           <div>
             has {anecdote.votes}
             <button onClick={(event) => {
-              handleVote({event, id: anecdote.id})
+              handleVote({event, id: anecdote.id, content: anecdote.content})
             }}>vote
             </button>
           </div>

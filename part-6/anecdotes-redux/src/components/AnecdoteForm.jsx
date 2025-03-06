@@ -7,6 +7,10 @@ function AnecdoteForm() {
     event.preventDefault()
     const content = event.target.anecdote.value
     dispatch({type: "anecdote/create", payload: content})
+    dispatch({type: "notification/set", payload: `You created anecdote "${content}".` })
+    setTimeout(() => {
+      dispatch({type: "notification/remove"})
+    }, 5000)
   }
 
   return (
