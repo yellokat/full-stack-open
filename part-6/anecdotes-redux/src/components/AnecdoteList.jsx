@@ -3,7 +3,8 @@ import {voteActionCreator} from "../reducers/anecdoteReducer.js";
 
 function AnecdoteList() {
 
-  const anecdotes = useSelector(state => state)
+  const anecdotes = useSelector(state => state.anecdote)
+  const filter = useSelector(state => state.filter)
   const dispatch = useDispatch()
 
   const handleVote = ({event, id}) => {
@@ -13,7 +14,9 @@ function AnecdoteList() {
 
   return (
     <div>
-      {anecdotes.map(anecdote =>
+      {anecdotes.filter(
+        anecdote => anecdote.content.includes(filter)
+      ).map(anecdote =>
         <div key={anecdote.id}>
           <div>
             {anecdote.content}
