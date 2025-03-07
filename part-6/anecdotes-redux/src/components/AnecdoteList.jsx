@@ -13,7 +13,7 @@ function AnecdoteList() {
     dispatch({type: "notification/set", payload: `You upvoted anecdote "${anecdote.content}".` })
     setTimeout(() => {
       dispatch({type: "notification/remove"})
-    }, 5000)
+    }, 1000)
   }
 
   return (

@@ -7,7 +7,6 @@ const Notification = () => {
     padding: 10,
     borderWidth: 1
   }
-  console.log(`notification ${notification}`)
   return (notification) ?
     <div style={style}>
       {notification}

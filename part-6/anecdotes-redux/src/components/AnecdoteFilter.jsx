@@ -1,4 +1,5 @@
 import {useDispatch} from "react-redux";
+import {setFilter} from "../reducers/filterSlice.js";
 
 function AnecdoteFilter() {
   const dispatch = useDispatch()
@@ -6,10 +7,7 @@ function AnecdoteFilter() {
   const handleChange = (event) => {
     event.preventDefault();
     const filterString = event.target.value
-    dispatch({
-      type:'filter/setFilter',
-      payload: filterString
-    })
+    dispatch(setFilter(filterString))
   }
 
   const style = {
