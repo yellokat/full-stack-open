@@ -3,19 +3,14 @@ import AnecdoteList from "./components/AnecdoteList.jsx";
 import AnecdoteFilter from "./components/AnecdoteFilter.jsx";
 import Notification from "./components/Notification.jsx";
 import {useEffect} from "react";
-import anecdoteService from "./services/anecdotes";
-import store from "./store.js";
+import {initializeAnecdotes} from "./reducers/anecdoteSlice.js";
+import {useDispatch} from "react-redux";
 
 const App = () => {
+  const dispatch = useDispatch()
+
   useEffect(()=>{
-    anecdoteService.getAll().then(
-      (anecdotes)=>{
-        store.dispatch({
-          type:"anecdote/setAnecdotes",
-          payload:anecdotes,
-        })
-      }
-    )
+    dispatch(initializeAnecdotes())
   }, [])
 
   return (

@@ -1,5 +1,5 @@
 import {useDispatch} from "react-redux";
-import anecdoteService from "../services/anecdotes"
+import {createAnecdote} from "../reducers/anecdoteSlice.js";
 
 function AnecdoteForm() {
   const dispatch = useDispatch()
@@ -7,10 +7,7 @@ function AnecdoteForm() {
   const handleCreate = async (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
-    // save to backend
-    const createdAnecdote = await anecdoteService.createNew(content)
-    // update frontend
-    dispatch({type: "anecdote/create", payload: createdAnecdote})
+    dispatch(createAnecdote(content))
     dispatch({type: "notification/set", payload: `You created anecdote "${content}".` })
     setTimeout(() => {
       dispatch({type: "notification/remove"})
