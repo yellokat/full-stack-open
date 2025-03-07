@@ -1,4 +1,5 @@
 import {useDispatch, useSelector} from "react-redux";
+import {voteAnecdote} from "../reducers/anecdoteSlice.js";
 
 function AnecdoteList() {
 
@@ -6,10 +7,10 @@ function AnecdoteList() {
   const filter = useSelector(state => state.filter)
   const dispatch = useDispatch()
 
-  const handleVote = ({event, id, content}) => {
+  const handleVote = ({event, anecdote}) => {
     event.preventDefault()
-    dispatch({type:"anecdote/vote", payload:id})
-    dispatch({type: "notification/set", payload: `You upvoted anecdote "${content}".` })
+    dispatch(voteAnecdote(anecdote))
+    dispatch({type: "notification/set", payload: `You upvoted anecdote "${anecdote.content}".` })
     setTimeout(() => {
       dispatch({type: "notification/remove"})
     }, 5000)
@@ -27,7 +28,7 @@ function AnecdoteList() {
           <div>
             has {anecdote.votes}
             <button onClick={(event) => {
-              handleVote({event, id: anecdote.id, content: anecdote.content})
+              handleVote({event, anecdote})
             }}>vote
             </button>
           </div>
