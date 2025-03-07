@@ -1,12 +1,16 @@
 import {useDispatch} from "react-redux";
+import anecdoteService from "../services/anecdotes"
 
 function AnecdoteForm() {
   const dispatch = useDispatch()
 
-  const handleCreate = (event) => {
+  const handleCreate = async (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
-    dispatch({type: "anecdote/create", payload: content})
+    // save to backend
+    const createdAnecdote = await anecdoteService.createNew(content)
+    // update frontend
+    dispatch({type: "anecdote/create", payload: createdAnecdote})
     dispatch({type: "notification/set", payload: `You created anecdote "${content}".` })
     setTimeout(() => {
       dispatch({type: "notification/remove"})
