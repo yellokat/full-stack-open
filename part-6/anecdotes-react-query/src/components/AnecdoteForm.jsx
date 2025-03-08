@@ -5,9 +5,10 @@ const AnecdoteForm = () => {
   const queryClient = useQueryClient()
 
   const createAnecdoteMutation = useMutation({
-    mutationFn : createAnecdote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
+    mutationFn: createAnecdote,
+    onSuccess: (createdAnecdote) => {
+      const anecdotes = queryClient.getQueryData(['anecdotes'])
+      queryClient.setQueryData(['anecdotes'], anecdotes.concat(createdAnecdote))
     },
   })
 
@@ -19,13 +20,13 @@ const AnecdoteForm = () => {
       content,
       votes: 0,
     })
-}
+  }
 
   return (
     <div>
       <h3>create new</h3>
       <form onSubmit={onCreate}>
-        <input name='anecdote' />
+        <input name='anecdote'/>
         <button type="submit">create</button>
       </form>
     </div>

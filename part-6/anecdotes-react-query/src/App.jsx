@@ -2,14 +2,40 @@ import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {getAnecdotes, voteAnecdote} from './requests.jsx'
+import {useReducer} from "react";
+
+const notificationReducer = (state, action) => {
+  switch (action.type) {
+    case "SET":
+      return action.payload.notificationString
+    case "REMOVE":
+      return null
+    default:
+      return state
+  }
+}
 
 const App = () => {
+  const [notification, notificationDispatch] = useReducer(notificationReducer, null)
+
+
   const queryClient = useQueryClient()
 
   const updateMutation = useMutation({
     mutationFn: voteAnecdote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['anecdotes'] });
+    onSuccess: (updatedAnecdote) => {
+      const anecdotes = queryClient.getQueryData(['anecdotes'])
+      const updatedAnecdotes = [...anecdotes].map((anecdote) => {
+        if (anecdote.id === updatedAnecdote.id) {
+          return {
+            ...anecdote,
+            votes: anecdote.votes + 1
+          }
+        }
+        return anecdote
+      })
+      updatedAnecdotes.sort((a, b) => b.votes - a.votes)
+      queryClient.setQueryData(['anecdotes'], updatedAnecdotes)
     },
   })
 
@@ -19,20 +45,18 @@ const App = () => {
     retry: 1
   })
 
-  if ( result.isLoading ) {
+  if (result.isLoading) {
     return <div>loading data...</div>
   }
 
-  if(result.isError){
+  if (result.isError) {
     return <div>anecdote service not available due to server error</div>
   }
 
-
-
-  const handleVote = (anecdote)=>{
+  const handleVote = (anecdote) => {
     updateMutation.mutate({
       ...anecdote,
-      votes: anecdote.votes+1
+      votes: anecdote.votes + 1
     })
   }
 
@@ -41,10 +65,10 @@ const App = () => {
   return (
     <div>
       <h3>Anecdote app</h3>
-    
-      <Notification />
-      <AnecdoteForm />
-    
+
+      <Notification/>
+      <AnecdoteForm/>
+
       {anecdotes.map(anecdote =>
         <div key={anecdote.id}>
           <div>
