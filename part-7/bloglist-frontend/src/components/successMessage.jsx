@@ -1,12 +1,12 @@
-import React from 'react'
-import '../index.css'
+import React from "react";
+import "../index.css";
 
 const SuccessMessage = ({ message }) => {
-  if (message === '') {
-    return <></>
+  if (message === "") {
+    return <></>;
   } else {
-    return <div className="successMessage">{message}</div>
+    return <div className="successMessage">{message}</div>;
   }
-}
+};
 
-export default SuccessMessage
+export default SuccessMessage;
