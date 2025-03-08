@@ -21,15 +21,24 @@ function App() {
     const filteredCountries = [...countries].filter((country) => {
       return country.name.common.toLowerCase().includes(query)
     })
-    console.log(`${filteredCountries.length} countries found.`)
     setSearchResults(filteredCountries)
+  }
+
+  const handleShowButton = ({ targetCountryName }) => {
+    // update input element
+    const inputElement = document.getElementById("searchQueryInput")
+    inputElement.value = targetCountryName
+
+    // update search result state
+    const foundCountry = [...countries].find((country)=>country.name.common === targetCountryName)
+    setSearchResults([ foundCountry ])
   }
 
   return (
     <div>
       find countries
-      <input onChange={handleChange}></input>
-      <SearchResult foundCountries={searchResults}/>
+      <input id="searchQueryInput" onChange={handleChange}></input>
+      <SearchResult foundCountries={searchResults} handleShowButton={handleShowButton}/>
     </div>
   )
 }

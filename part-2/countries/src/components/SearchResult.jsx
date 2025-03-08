@@ -1,6 +1,6 @@
 import React from 'react';
 
-function SearchResult({foundCountries}) {
+function SearchResult({ foundCountries, handleShowButton }) {
   if (foundCountries.length > 10) {
     return (<div>too many matches, specify another filter</div>)
   } else if (foundCountries.length === 1) {
@@ -23,7 +23,13 @@ function SearchResult({foundCountries}) {
     return (
       <div>
         {foundCountries.map((country) => {
-          return <span>{country.name.common}<br/></span>
+          return (
+            <span key={country.name.common}>
+              {country.name.common}
+              <button onClick={ () => handleShowButton({ targetCountryName : country.name.common }) }>show</button>
+              <br/>
+            </span>
+          )
         })}
       </div>
     )
