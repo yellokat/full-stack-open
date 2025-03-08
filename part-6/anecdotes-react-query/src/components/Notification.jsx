@@ -1,3 +1,6 @@
+import {useContext} from "react";
+import NotificationContext from "../notificationContext.jsx";
+
 const Notification = () => {
   const style = {
     border: 'solid',
@@ -5,12 +8,14 @@ const Notification = () => {
     borderWidth: 1,
     marginBottom: 5
   }
+
+  const [notificationString] = useContext(NotificationContext)
   
-  if (true) return null
+  if (!notificationString) return null
 
   return (
     <div style={style}>
-      
+      {notificationString}
     </div>
   )
 }

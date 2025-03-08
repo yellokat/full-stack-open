@@ -3,11 +3,12 @@ import Notification from './components/Notification'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {getAnecdotes, voteAnecdote} from './requests.jsx'
 import {useReducer} from "react";
+import NotificationContext from "./notificationContext"
 
 const notificationReducer = (state, action) => {
   switch (action.type) {
     case "SET":
-      return action.payload.notificationString
+      return action.payload
     case "REMOVE":
       return null
     default:
@@ -16,9 +17,7 @@ const notificationReducer = (state, action) => {
 }
 
 const App = () => {
-  const [notification, notificationDispatch] = useReducer(notificationReducer, null)
-
-
+  const [notificationString, notificationStringDispatch] = useReducer(notificationReducer, null)
   const queryClient = useQueryClient()
 
   const updateMutation = useMutation({
@@ -36,6 +35,13 @@ const App = () => {
       })
       updatedAnecdotes.sort((a, b) => b.votes - a.votes)
       queryClient.setQueryData(['anecdotes'], updatedAnecdotes)
+      notificationStringDispatch({
+        type: "SET",
+        payload: `You voted for anecdote : ${updatedAnecdote.content}`
+      })
+      setTimeout(() => {
+        notificationStringDispatch({type: "REMOVE"})
+      }, 5000)
     },
   })
 
@@ -63,24 +69,26 @@ const App = () => {
   const anecdotes = result.data
 
   return (
-    <div>
-      <h3>Anecdote app</h3>
+    <NotificationContext.Provider value={[ notificationString, notificationStringDispatch ]}>
+      <div>
+        <h3>Anecdote app</h3>
 
-      <Notification/>
-      <AnecdoteForm/>
+        <Notification/>
+        <AnecdoteForm/>
 
-      {anecdotes.map(anecdote =>
-        <div key={anecdote.id}>
-          <div>
-            {anecdote.content}
+        {anecdotes.map(anecdote =>
+          <div key={anecdote.id}>
+            <div>
+              {anecdote.content}
+            </div>
+            <div>
+              has {anecdote.votes}
+              <button onClick={() => handleVote(anecdote)}>vote</button>
+            </div>
           </div>
-          <div>
-            has {anecdote.votes}
-            <button onClick={() => handleVote(anecdote)}>vote</button>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </NotificationContext.Provider>
   )
 }
 
