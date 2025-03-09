@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
-import loginService from './services/login'
-import blogService from './services/blogs'
 import Togglable from './components/Togglable.jsx'
 import CreateBlogForm from './components/createBlogForm.jsx'
 import { useDispatch, useSelector } from 'react-redux'
@@ -18,16 +16,18 @@ import {
   removeBlog,
   updateBlog,
 } from './reducers/blogSlice.js'
+import {autoLogin, login, logout} from './reducers/userSlice.js'
 
 const App = () => {
   // login form
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   // active login user
-  const [user, setUser] = useState(null)
+  const user = useSelector((state) => state.user)
   // create blog visibility ref
   const createBlogFormRef = useRef()
   const dispatch = useDispatch()
+  // blog list state
   const blogs = useSelector((state) => state.blog)
 
   // ========================================================
@@ -36,26 +36,17 @@ const App = () => {
 
   const handleLogout = async (event) => {
     event.preventDefault()
-    setUser(null)
+    await dispatch(logout())
     window.localStorage.removeItem('activeUser')
   }
 
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({
-        username,
-        password,
-      })
-      window.localStorage.setItem('activeUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
+      await dispatch(login({ username, password }))
       setUsername('')
       setPassword('')
-      // display notification
-      dispatch(setSuccessNotification(`logged in as ${user.name}`, 1))
     } catch (exception) {
-      // display notification
       dispatch(setErrorNotification('wrong credentials', 1))
     }
   }
@@ -102,10 +93,16 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('activeUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+      dispatch(autoLogin({ ...user }))
     }
   }, [])
+
+  useEffect(() => {
+    if (user.name) {
+      dispatch(setSuccessNotification(`logged in as ${user.name}`, 1))
+      window.localStorage.setItem('activeUser', JSON.stringify(user))
+    }
+  }, [user])
 
   // ========================================================
   // blog list section
@@ -146,7 +143,13 @@ const App = () => {
   // ========================================================
 
   const onUpdate = async ({ id, updatedLikes }) => {
-    dispatch(updateBlog({ id, updatedLikes }))
+    dispatch(
+      updateBlog({
+        id,
+        updatedLikes,
+        token: user.token,
+      }),
+    )
   }
 
   const onRemove = async ({ targetBlog }) => {
@@ -155,14 +158,24 @@ const App = () => {
         `Really delete ${targetBlog.title} by ${targetBlog.author}?`,
       )
     ) {
-      dispatch(removeBlog(targetBlog.id))
+      dispatch(
+        removeBlog({
+          targetBlogId: targetBlog.id,
+          token: user.token,
+        }),
+      )
     }
   }
 
   const onCreate = async ({ title, author, url }) => {
     try {
       createBlogFormRef.current.toggleVisibility()
-      await dispatch(createBlog({ title, author, url }))
+      await dispatch(
+        createBlog({
+          newBlog: { title, author, url },
+          token: user.token,
+        }),
+      )
       // display notification
       dispatch(
         setSuccessNotification(
@@ -176,7 +189,7 @@ const App = () => {
   }
 
   // root widget
-  return <div>{user ? blogListSection() : loginSection()}</div>
+  return <div>{user.token ? blogListSection() : loginSection()}</div>
 }
 
 export default App

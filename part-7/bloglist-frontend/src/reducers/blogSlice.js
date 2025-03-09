@@ -38,29 +38,39 @@ export const initializeBlogs = () => {
   }
 }
 
-export const createBlog = (newBlog) => {
+export const createBlog = ({ newBlog, token }) => {
   return async (dispatch) => {
-    const createdBlog = await blogService.create({
-      title: newBlog.title,
-      author: newBlog.author,
-      url: newBlog.url,
-    })
+    const createdBlog = await blogService.create(
+      {
+        title: newBlog.title,
+        author: newBlog.author,
+        url: newBlog.url,
+      },
+      token,
+    )
     dispatch(append(createdBlog))
   }
 }
 
-export const updateBlog = ({ id, updatedLikes }) => {
+export const updateBlog = ({ id, updatedLikes, token }) => {
   return async (dispatch) => {
-    const updatedBlog = await blogService.update(id, {
-      likes: updatedLikes,
-    })
+    const updatedBlog = await blogService.update(
+      id,
+      {
+        likes: updatedLikes,
+      },
+      token,
+    )
     dispatch(update(updatedBlog))
   }
 }
 
-export const removeBlog = (targetBlogId) => {
+export const removeBlog = ({ targetBlogId, token }) => {
   return async (dispatch) => {
-    await blogService.remove(targetBlogId)
+    await blogService.remove({
+      id: targetBlogId,
+      token,
+    })
     dispatch(remove(targetBlogId))
   }
 }
