@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs.js'
 
-function CreateBlogForm({ handleCreateBlog }) {
+function CreateBlogForm({ onCreate }) {
   // create blog form
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -13,7 +12,7 @@ function CreateBlogForm({ handleCreateBlog }) {
       <form
         onSubmit={(event) => {
           event.preventDefault()
-          handleCreateBlog({ title, author, url })
+          onCreate({ title, author, url })
           setTitle('')
           setAuthor('')
           setUrl('')

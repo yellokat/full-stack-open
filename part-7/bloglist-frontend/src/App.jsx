@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
-import blogService from './services/blogs'
 import loginService from './services/login'
+import blogService from './services/blogs'
 import Togglable from './components/Togglable.jsx'
 import CreateBlogForm from './components/createBlogForm.jsx'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,6 +12,12 @@ import {
   setSuccessNotification,
 } from './reducers/notificationSlice.js'
 import NotificationComponent from './components/NotificationComponent.jsx'
+import {
+  createBlog,
+  initializeBlogs,
+  removeBlog,
+  updateBlog,
+} from './reducers/blogSlice.js'
 
 const App = () => {
   // login form
@@ -19,11 +25,10 @@ const App = () => {
   const [password, setPassword] = useState('')
   // active login user
   const [user, setUser] = useState(null)
-  // blog list
-  const [blogs, setBlogs] = useState([])
   // create blog visibility ref
   const createBlogFormRef = useRef()
   const dispatch = useDispatch()
+  const blogs = useSelector((state) => state.blog)
 
   // ========================================================
   // login functionality
@@ -115,46 +120,33 @@ const App = () => {
         <button onClick={handleLogout}>logout</button>
       </p>
       <Togglable buttonLabel="create new" ref={createBlogFormRef}>
-        <CreateBlogForm handleCreateBlog={handleCreateBlog} />
+        <CreateBlogForm onCreate={onCreate} />
       </Togglable>
       <br />
-      {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          currentUser={user}
-          blog={blog}
-          onUpdate={onUpdate}
-          onRemove={onRemove}
-        />
-      ))}
+      {blogs
+        ? blogs.map((blog) => (
+          <Blog
+            key={blog.id}
+            currentUser={user}
+            blog={blog}
+            onUpdate={onUpdate}
+            onRemove={onRemove}
+          />
+        ))
+        : null}
     </div>
   )
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => {
-      setBlogs(blogs.sort((a, b) => b.likes - a.likes))
-    })
+    dispatch(initializeBlogs())
   }, [])
 
   // ========================================================
   // create blog callback functions
   // ========================================================
 
-  const appendToLocalBlogList = ({ blog }) => {
-    setBlogs([...blogs, blog])
-  }
-
   const onUpdate = async ({ id, updatedLikes }) => {
-    const updatedBlog = await blogService.update(id, {
-      likes: updatedLikes,
-    })
-    const updatedBlogs = [...blogs].map((blog) => {
-      if (blog.id === updatedBlog.id) {
-        return updatedBlog
-      }
-      return blog
-    })
-    setBlogs(updatedBlogs.sort((a, b) => b.likes - a.likes))
+    dispatch(updateBlog({ id, updatedLikes }))
   }
 
   const onRemove = async ({ targetBlog }) => {
@@ -163,39 +155,24 @@ const App = () => {
         `Really delete ${targetBlog.title} by ${targetBlog.author}?`,
       )
     ) {
-      await blogService.remove(targetBlog.id)
-      const updatedBlogs = [...blogs].filter(
-        (blogEntry) => blogEntry.id !== targetBlog.id,
-      )
-      setBlogs(updatedBlogs)
+      dispatch(removeBlog(targetBlog.id))
     }
   }
 
-  const handleCreateBlog = async ({ title, author, url }) => {
+  const onCreate = async ({ title, author, url }) => {
     try {
       createBlogFormRef.current.toggleVisibility()
-      const blog = await blogService.create({
-        title,
-        author,
-        url,
-      })
+      await dispatch(createBlog({ title, author, url }))
       // display notification
-      await onSuccess({ title, author, blog })
+      dispatch(
+        setSuccessNotification(
+          `new blog post added : [${title}] by ${author}`,
+          1,
+        ),
+      )
     } catch (exception) {
-      onError({ exception })
+      dispatch(setErrorNotification(exception.toString(), 1))
     }
-  }
-
-  const onSuccess = async ({ title, author, blog }) => {
-    dispatch(
-      setSuccessNotification(`new blog post added : [${title}] by ${author}`, 1),
-    )
-    appendToLocalBlogList({ blog })
-  }
-
-  const onError = ({ exception }) => {
-    // display notification
-    dispatch(setErrorNotification(exception.toString(), 1))
   }
 
   // root widget
