@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { logout } from '../reducers/userSlice.js'
 import userService from '../services/users'
+import { initializeUsers } from '../reducers/usersSlice.js'
 
 function UsersPage() {
   const user = useSelector((state) => state.user)
+  const users = useSelector((state) => state.users)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const [users, setUsers] = useState([])
   useEffect(() => {
-    if (user.token) {
-      userService.getAll(user.token).then((response) => setUsers(response))
-    }
-  }, [user])
+    dispatch(initializeUsers())
+  }, [])
+
+  // useEffect(() => {
+  //   if (user.token) {
+  //
+  //     userService.getAll(user.token).then((response) => setUsers(response))
+  //   }
+  // }, [user])
 
   // useEffect(() => {
   //   if (!user.name) {
@@ -23,6 +29,7 @@ function UsersPage() {
   //   }
   // }, [user])
 
+  // noinspection DuplicatedCode
   const handleLogout = async (event) => {
     event.preventDefault()
     await dispatch(logout())
@@ -40,8 +47,8 @@ function UsersPage() {
         </thead>
         <tbody>
           {data.map((user) => (
-            <tr key={user.username}>
-              <td>{user.name}</td>
+            <tr key={user.id}>
+              <td>{<Link to={`/users/${user.id}`}>{user.name}</Link>}</td>
               <td>{user.blogs.length}</td>
             </tr>
           ))}

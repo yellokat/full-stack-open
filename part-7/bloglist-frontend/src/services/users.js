@@ -6,7 +6,7 @@ const getAll = async (token) => {
     headers: { Authorization: `Bearer ${token}` },
   }
 
-  const request = axios.get(baseUrl)
+  const request = axios.get(baseUrl, config)
   return request.then((response) => response.data)
 }
 

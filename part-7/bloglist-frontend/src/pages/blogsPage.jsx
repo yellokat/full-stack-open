@@ -10,7 +10,7 @@ import {
   initializeBlogs,
   removeBlog,
   updateBlog,
-} from '../reducers/blogSlice.js'
+} from '../reducers/blogsSlice.js'
 import {
   setErrorNotification,
   setSuccessNotification,
@@ -21,7 +21,7 @@ function BlogsPage() {
   // create blog visibility ref
   const createBlogFormRef = useRef()
   // blog list state
-  const blogs = useSelector((state) => state.blog)
+  const blogs = useSelector((state) => state.blogs)
   const user = useSelector((state) => state.user)
   const notificationState = useSelector((state) => state.notification)
   const dispatch = useDispatch()
@@ -31,18 +31,11 @@ function BlogsPage() {
     dispatch(initializeBlogs())
   }, [])
 
-  useEffect(() => {
-    if (user.name) {
-      dispatch(setSuccessNotification(`logged in as ${user.name}`, 1))
-      window.localStorage.setItem('activeUser', JSON.stringify(user))
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!user.name) {
-      navigate('/')
-    }
-  }, [user])
+  // useEffect(() => {
+  //   if (user.name) {
+  //
+  //   }
+  // }, [user])
 
   // ========================================================
   // logout functionality

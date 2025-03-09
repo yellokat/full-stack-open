@@ -2,7 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import blogService from '../services/blogs'
 
-const blogSlice = createSlice({
+const blogsSlice = createSlice({
   name: 'blog',
   initialState: [],
   reducers: {
@@ -29,7 +29,7 @@ const blogSlice = createSlice({
   },
 })
 
-export const { init, append, update, remove } = blogSlice.actions
+export const { init, append, update, remove } = blogsSlice.actions
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
@@ -75,4 +75,4 @@ export const removeBlog = ({ targetBlogId, token }) => {
   }
 }
 
-export default blogSlice.reducer
+export default blogsSlice.reducer

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import NotificationComponent from '../components/NotificationComponent.jsx'
 import { autoLogin, login } from '../reducers/userSlice.js'
-import { setErrorNotification } from '../reducers/notificationSlice.js'
+import {setErrorNotification, setSuccessNotification} from '../reducers/notificationSlice.js'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -29,6 +29,8 @@ function LoginPage(props) {
 
   useEffect(() => {
     if (user.token) {
+      dispatch(setSuccessNotification(`logged in as ${user.name}`, 1))
+      window.localStorage.setItem('activeUser', JSON.stringify(user))
       navigate('/blogs')
     }
   }, [user])

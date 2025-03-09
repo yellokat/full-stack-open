@@ -9,6 +9,7 @@ import {
   useNavigate,
 } from 'react-router-dom'
 import UsersPage from './pages/usersPage.jsx'
+import UserPage from './pages/userPage.jsx'
 
 const ConditionalNavigationMenu = ({ children }) => {
   const location = useLocation()
@@ -38,7 +39,9 @@ const App = () => {
           <Routes>
             <Route path="/" element={<LoginPage />} />;
             <Route path="/blogs" element={<BlogsPage />} />
+            {/*<Route path="/blogs/:id" element={<BlogPage />} />*/}
             <Route path="/users" element={<UsersPage />} />
+            <Route path="/users/:id" element={<UserPage />} />
           </Routes>
         </ConditionalNavigationMenu>
       </Router>
