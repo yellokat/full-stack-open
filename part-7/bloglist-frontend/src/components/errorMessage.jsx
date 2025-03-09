@@ -1,12 +1,12 @@
-import React from "react";
-import "../index.css";
+import React from 'react'
+import '../index.css'
 
 const ErrorMessage = ({ message }) => {
-  if (message === "") {
-    return <></>;
+  if (message === '') {
+    return <></>
   } else {
-    return <div className="errorMessage">{message}</div>;
+    return <div className="errorMessage">{message}</div>
   }
-};
+}
 
-export default ErrorMessage;
+export default ErrorMessage

@@ -1,16 +1,16 @@
-import { useState } from "react";
-import blogService from "../services/blogs";
+import { useState } from 'react'
+import blogService from '../services/blogs'
 
 const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false)
 
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
-    border: "solid",
+    border: 'solid',
     borderWidth: 1,
     marginBottom: 5,
-  };
+  }
 
   return expanded ? (
     <div style={blogStyle}>
@@ -22,7 +22,7 @@ const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
       likes {blog.likes}
       <button
         onClick={async () => {
-          onUpdate({ id: blog.id, updatedLikes: blog.likes + 1 });
+          onUpdate({ id: blog.id, updatedLikes: blog.likes + 1 })
         }}
       >
         like
@@ -33,7 +33,7 @@ const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
       {blog.user.username === currentUser.username ? (
         <button
           onClick={async () => {
-            onRemove({ targetBlog: blog });
+            onRemove({ targetBlog: blog })
           }}
         >
           delete
@@ -45,7 +45,7 @@ const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
       {blog.title} {blog.author}
       <button onClick={() => setExpanded(true)}>view</button>
     </div>
-  );
-};
+  )
+}
 
-export default Blog;
+export default Blog

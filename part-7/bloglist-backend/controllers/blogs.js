@@ -45,17 +45,17 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) =
 
 // update a blogpost
 blogsRouter.put('/:id', middleware.userExtractor,async (request, response) => {
-  // current user
-  const currentUser = request.user
+  // // current user
+  // const currentUser = request.user
   // update target
   const targetBlog = await Blog.findById(request.params.id)
   if(!targetBlog){
     throw new errors.NotExistResourceError()
   }
-  // verify identity (compare tokens)
-  if(targetBlog.user.toString() !== currentUser.id){
-    return response.status(401).json({error: "permission denied"})
-  }
+  // // verify identity (compare tokens)
+  // if(targetBlog.user.toString() !== currentUser.id){
+  //   return response.status(401).json({error: "permission denied"})
+  // }
   const {title, author, url, likes} = request.body
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,

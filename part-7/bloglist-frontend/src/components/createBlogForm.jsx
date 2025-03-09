@@ -1,22 +1,22 @@
-import React, { useState } from "react";
-import blogService from "../services/blogs.js";
+import React, { useState } from 'react'
+import blogService from '../services/blogs.js'
 
 function CreateBlogForm({ handleCreateBlog }) {
   // create blog form
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
   return (
     <div>
       <h2>Create new</h2>
       <form
         onSubmit={(event) => {
-          event.preventDefault();
-          handleCreateBlog({ title, author, url });
-          setTitle("");
-          setAuthor("");
-          setUrl("");
+          event.preventDefault()
+          handleCreateBlog({ title, author, url })
+          setTitle('')
+          setAuthor('')
+          setUrl('')
         }}
       >
         <div>
@@ -49,7 +49,7 @@ function CreateBlogForm({ handleCreateBlog }) {
         <button type="submit">create</button>
       </form>
     </div>
-  );
+  )
 }
 
-export default CreateBlogForm;
+export default CreateBlogForm
