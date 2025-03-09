@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import blogService from '../services/blogs'
+import {Link} from "react-router-dom";
 
 const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
   const [expanded, setExpanded] = useState(false)
@@ -14,7 +15,7 @@ const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
 
   return expanded ? (
     <div style={blogStyle}>
-      {blog.title}
+      <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
       <button onClick={() => setExpanded(false)}>hide</button>
       <br />
       {blog.url}
@@ -42,7 +43,7 @@ const Blog = ({ blog, currentUser, onUpdate, onRemove }) => {
     </div>
   ) : (
     <div>
-      {blog.title} {blog.author}
+      <Link to={`/blogs/${blog.id}`}>{blog.title}</Link> {blog.author}
       <button onClick={() => setExpanded(true)}>view</button>
     </div>
   )

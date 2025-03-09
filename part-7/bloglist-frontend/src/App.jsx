@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom'
 import UsersPage from './pages/usersPage.jsx'
 import UserPage from './pages/userPage.jsx'
+import BlogPage from "./pages/blogPage.jsx";
 
 const ConditionalNavigationMenu = ({ children }) => {
   const location = useLocation()
@@ -39,7 +40,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<LoginPage />} />;
             <Route path="/blogs" element={<BlogsPage />} />
-            {/*<Route path="/blogs/:id" element={<BlogPage />} />*/}
+            <Route path="/blogs/:id" element={<BlogPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/users/:id" element={<UserPage />} />
           </Routes>

@@ -15,7 +15,8 @@ import {
   setErrorNotification,
   setSuccessNotification,
 } from '../reducers/notificationSlice.js'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { navigate } from 'jsdom/lib/jsdom/living/window/navigation.js'
 
 function BlogsPage() {
   // create blog visibility ref
@@ -45,6 +46,7 @@ function BlogsPage() {
     event.preventDefault()
     await dispatch(logout())
     window.localStorage.removeItem('activeUser')
+    navigate('/')
   }
 
   // ========================================================
@@ -111,13 +113,14 @@ function BlogsPage() {
       <br />
       {blogs
         ? blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            currentUser={user}
-            blog={blog}
-            onUpdate={onUpdate}
-            onRemove={onRemove}
-          />
+          <div><Link key={blog.id} to={`/blogs/${blog.id}`}>{blog.title}</Link><br/></div>
+          // <Blog
+          //   key={blog.id}
+          //   currentUser={user}
+          //   blog={blog}
+          //   onUpdate={onUpdate}
+          //   onRemove={onRemove}
+          // />
         ))
         : null}
     </div>

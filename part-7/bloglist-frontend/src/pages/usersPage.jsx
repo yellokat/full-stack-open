@@ -34,6 +34,7 @@ function UsersPage() {
     event.preventDefault()
     await dispatch(logout())
     window.localStorage.removeItem('activeUser')
+    navigate('/')
   }
 
   const CustomTable = ({ data }) => {

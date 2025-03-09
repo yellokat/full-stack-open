@@ -17,6 +17,7 @@ function UserPage() {
     event.preventDefault()
     await dispatch(logout())
     window.localStorage.removeItem('activeUser')
+    navigate('/')
   }
 
   if (!user.token) {
