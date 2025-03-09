@@ -65,4 +65,35 @@ blogsRouter.put('/:id', middleware.userExtractor,async (request, response) => {
   return response.status(200).json(updatedBlog)
 })
 
+// add a comment
+blogsRouter.post('/:id/comments', middleware.userExtractor, async (request, response) => {
+  // current user (comment is anonymous but must be logged in to create one)
+  const currentUser = request.user
+  // target blog to leave comment on
+  const targetBlog = await Blog.findById(request.params.id)
+  if(!targetBlog){
+    throw new errors.NotExistResourceError()
+  }
+  // verify identity (compare tokens)
+  if(targetBlog.user.toString() !== currentUser.id){
+    return response.status(401).json({error: "permission denied"})
+  }
+
+  // validate request body
+  if(!request.body){
+    return response.status(400).json({error: "request body is required."})
+  }else if(!request.body.comment){
+    return response.status(400).json({error: "comment field is required."})
+  }
+  const comment = request.body.comment
+
+  // append comment to blog field
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    request.params.id,
+    {comments:[...targetBlog.comments, comment]},
+    {new: true, runValidators: true, context: 'query'}
+  ).populate('user', {username:1, name:1})
+  return response.status(201).json(request.body)
+})
+
 module.exports = blogsRouter
