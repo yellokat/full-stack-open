@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../reducers/userSlice.js'
@@ -11,6 +11,17 @@ function BlogPage() {
   const targetBlog = blogs.find((blog) => blog.id === id)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!user.token) {
+      navigate('/')
+    }
+  }, [user])
+
+  if(!user.token){
+    return null
+  }
+
 
   const handleLike = async () => {
     dispatch(

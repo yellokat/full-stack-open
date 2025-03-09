@@ -29,6 +29,12 @@ function BlogsPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    if (!user.token) {
+      navigate('/')
+    }
+  }, [user])
+
+  useEffect(() => {
     dispatch(initializeBlogs())
   }, [])
 

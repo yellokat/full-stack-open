@@ -12,6 +12,12 @@ function UsersPage() {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    if (!user.token) {
+      navigate('/')
+    }
+  }, [user])
+
+  useEffect(() => {
     dispatch(initializeUsers())
   }, [])
 

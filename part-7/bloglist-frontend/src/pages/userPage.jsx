@@ -12,7 +12,13 @@ function UserPage() {
   const dispatch = useDispatch()
   const targetUser = users.find((u) => u.id === id)
 
-  if (!user.token) {
+  useEffect(() => {
+    if (!user.token) {
+      navigate('/')
+    }
+  }, [user])
+
+  if(!user.token){
     return null
   }
 
