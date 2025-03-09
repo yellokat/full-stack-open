@@ -60,9 +60,6 @@ function UsersPage() {
 
   return (
     <div>
-      <h2>blogs</h2>
-      <span>{user.name} logged in</span>
-      <button onClick={handleLogout}>logout</button>
       <h2>Users</h2>
       <CustomTable data={users} />
     </div>

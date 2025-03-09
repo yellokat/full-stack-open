@@ -12,23 +12,12 @@ function UserPage() {
   const dispatch = useDispatch()
   const targetUser = users.find((u) => u.id === id)
 
-  // noinspection DuplicatedCode
-  const handleLogout = async (event) => {
-    event.preventDefault()
-    await dispatch(logout())
-    window.localStorage.removeItem('activeUser')
-    navigate('/')
-  }
-
   if (!user.token) {
     return null
   }
 
   return (
     <div>
-      <h2>blogs</h2>
-      <span>{user.name} logged in</span>
-      <button onClick={handleLogout}>logout</button>
       <h2>{targetUser.name}</h2>
       <h3>Added blogs</h3>
       <ul>

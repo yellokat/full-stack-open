@@ -12,14 +12,6 @@ function BlogPage() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  // noinspection DuplicatedCode
-  const handleLogout = async (event) => {
-    event.preventDefault()
-    await dispatch(logout())
-    window.localStorage.removeItem('activeUser')
-    navigate('/')
-  }
-
   const handleLike = async () => {
     dispatch(
       updateBlog({
@@ -48,11 +40,6 @@ function BlogPage() {
 
   return (
     <div>
-      <h2>blogs</h2>
-      <span>{user.name} logged in</span>
-      <br />
-      <br />
-      <button onClick={handleLogout}>logout</button>
       <h2>{targetBlog.title}</h2>
       <span>{targetBlog.url}</span>
       <br />

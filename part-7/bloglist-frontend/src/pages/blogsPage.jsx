@@ -102,18 +102,17 @@ function BlogsPage() {
   return (
     <div>
       <NotificationComponent notificationState={notificationState} />
-      <h2>blogs</h2>
-      <p>
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
-      </p>
+      <h2>Blog app</h2>
       <Togglable buttonLabel="create new" ref={createBlogFormRef}>
         <CreateBlogForm onCreate={onCreate} />
       </Togglable>
       <br />
       {blogs
         ? blogs.map((blog) => (
-          <div><Link key={blog.id} to={`/blogs/${blog.id}`}>{blog.title}</Link><br/></div>
+          <Link key={blog.id} to={`/blogs/${blog.id}`}>
+            {blog.title}
+            <br />
+          </Link>
           // <Blog
           //   key={blog.id}
           //   currentUser={user}
