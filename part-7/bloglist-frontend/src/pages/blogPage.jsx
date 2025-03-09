@@ -18,10 +18,9 @@ function BlogPage() {
     }
   }, [user])
 
-  if(!user.token){
+  if (!user.token) {
     return null
   }
-
 
   const handleLike = async () => {
     dispatch(
@@ -49,6 +48,10 @@ function BlogPage() {
     }
   }
 
+  function getRandomInt() {
+    return Math.floor(Math.random() * 1000) + 1
+  }
+
   return (
     <div>
       <h2>{targetBlog.title}</h2>
@@ -63,6 +66,12 @@ function BlogPage() {
       {user.username === targetBlog.user.username ? (
         <button onClick={handleRemove}>delete</button>
       ) : null}
+      <h3>comments</h3>
+      <ul>
+        {targetBlog.comments.map((comment) => (
+          <li key={getRandomInt()}>{comment}</li>
+        ))}
+      </ul>
     </div>
   )
 }
