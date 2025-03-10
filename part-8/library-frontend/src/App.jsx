@@ -28,7 +28,7 @@ const App = () => {
       <Notification errorMessage={errorMessage} />
 
       {/*content*/}
-      <Authors show={page === "authors"} />
+      <Authors show={page === "authors"} setError={showNotification} />
       <Books show={page === "books"} />
       <NewBook show={page === "add"} setError={showNotification} />
     </div>
