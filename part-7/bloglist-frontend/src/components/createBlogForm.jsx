@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Button, TextField, Typography } from '@mui/material'
 
 function CreateBlogForm({ onCreate }) {
   // create blog form
@@ -8,7 +9,7 @@ function CreateBlogForm({ onCreate }) {
 
   return (
     <div>
-      <h2>Create new</h2>
+      <Typography variant="h6">Create new</Typography>
       <form
         onSubmit={(event) => {
           event.preventDefault()
@@ -19,8 +20,21 @@ function CreateBlogForm({ onCreate }) {
         }}
       >
         <div>
-          title:
-          <input
+          <TextField
+            sx={{
+              height: 35,
+              '& .MuiInputBase-root': {
+                height: 30, // Adjust the height here
+              },
+              '& .MuiInputBase-input': {
+                padding: '8px', // Adjust padding for input content
+              },
+              '& .MuiFormLabel-root': {
+                fontSize: '0.75rem', // Smaller font size for the label
+                top: '-8px', // Adjust label position upwards when unfocused
+              },
+            }}
+            label="title"
             type="text"
             value={title}
             name="Title"
@@ -28,8 +42,21 @@ function CreateBlogForm({ onCreate }) {
           />
         </div>
         <div>
-          author:
-          <input
+          <TextField
+            sx={{
+              height: 35,
+              '& .MuiInputBase-root': {
+                height: 30, // Adjust the height here
+              },
+              '& .MuiInputBase-input': {
+                padding: '8px', // Adjust padding for input content
+              },
+              '& .MuiFormLabel-root': {
+                fontSize: '0.75rem', // Smaller font size for the label
+                top: '-8px', // Adjust label position upwards when unfocused
+              },
+            }}
+            label="author"
             type="text"
             value={author}
             name="Author"
@@ -37,15 +64,28 @@ function CreateBlogForm({ onCreate }) {
           />
         </div>
         <div>
-          url:
-          <input
+          <TextField
+            sx={{
+              height: 35,
+              '& .MuiInputBase-root': {
+                height: 30, // Adjust the height here
+              },
+              '& .MuiInputBase-input': {
+                padding: '8px', // Adjust padding for input content
+              },
+              '& .MuiFormLabel-root': {
+                fontSize: '0.75rem', // Smaller font size for the label
+                top: '-8px', // Adjust label position upwards when unfocused
+              },
+            }}
+            label="url"
             type="text"
             value={url}
             name="Url"
             onChange={({ target }) => setUrl(target.value)}
           />
         </div>
-        <button type="submit">create</button>
+        <Button type="submit">create</Button>
       </form>
     </div>
   )

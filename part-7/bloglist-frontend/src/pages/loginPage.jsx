@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import NotificationComponent from '../components/NotificationComponent.jsx'
 import { autoLogin, login } from '../reducers/userSlice.js'
-import {setErrorNotification, setSuccessNotification} from '../reducers/notificationSlice.js'
+import {
+  setErrorNotification,
+  setSuccessNotification,
+} from '../reducers/notificationSlice.js'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { Button, InputAdornment, TextField } from '@mui/material'
+import { AccountCircle } from '@mui/icons-material'
+import LockIcon from '@mui/icons-material/Lock'
 
 function LoginPage(props) {
   // login form
@@ -52,8 +58,18 @@ function LoginPage(props) {
       <NotificationComponent notificationState={notificationState} />
       <form onSubmit={handleLogin}>
         <div>
-          username
-          <input
+          <TextField
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <AccountCircle />
+                  </InputAdornment>
+                ),
+              },
+            }}
+            sx={{ height: 70 }}
+            label="username"
             type="text"
             value={username}
             name="Username"
@@ -62,8 +78,18 @@ function LoginPage(props) {
           />
         </div>
         <div>
-          password
-          <input
+          <TextField
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon />
+                  </InputAdornment>
+                ),
+              },
+            }}
+            sx={{ height: 70 }}
+            label="password"
             type="password"
             value={password}
             name="Password"
@@ -71,9 +97,9 @@ function LoginPage(props) {
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button type="submit" name="Submit">
+        <Button variant="contained" type="submit" name="Submit">
           login
-        </button>
+        </Button>
       </form>
     </div>
   )

@@ -4,6 +4,16 @@ import { Link, useNavigate } from 'react-router-dom'
 import { logout } from '../reducers/userSlice.js'
 import userService from '../services/users'
 import { initializeUsers } from '../reducers/usersSlice.js'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  TableHead,
+  Typography,
+} from '@mui/material'
 
 function UsersPage() {
   const user = useSelector((state) => state.user)
@@ -45,22 +55,28 @@ function UsersPage() {
 
   const CustomTable = ({ data }) => {
     return (
-      <table>
-        <thead>
-          <tr>
+      <Table>
+        <TableHead>
+          <TableRow>
             <th></th>
-            <th>Blogs created</th>
-          </tr>
-        </thead>
-        <tbody>
+            <TableHead>Blogs created</TableHead>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {data.map((user) => (
-            <tr key={user.id}>
-              <td>{<Link to={`/users/${user.id}`}>{user.name}</Link>}</td>
-              <td>{user.blogs.length}</td>
-            </tr>
+            <TableRow key={user.id}>
+              <TableCell>
+                <Typography variant="h6">
+                  {<Link to={`/users/${user.id}`}>{user.name}</Link>}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant="h6">{user.blogs.length}</Typography>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     )
   }
 

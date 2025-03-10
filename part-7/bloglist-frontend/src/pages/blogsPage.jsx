@@ -17,6 +17,13 @@ import {
 } from '../reducers/notificationSlice.js'
 import { Link, useNavigate } from 'react-router-dom'
 import { navigate } from 'jsdom/lib/jsdom/living/window/navigation.js'
+import {
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material'
 
 function BlogsPage() {
   // create blog visibility ref
@@ -113,21 +120,30 @@ function BlogsPage() {
         <CreateBlogForm onCreate={onCreate} />
       </Togglable>
       <br />
-      {blogs
-        ? blogs.map((blog) => (
-          <Link key={blog.id} to={`/blogs/${blog.id}`}>
-            {blog.title}
-            <br />
-          </Link>
-          // <Blog
-          //   key={blog.id}
-          //   currentUser={user}
-          //   blog={blog}
-          //   onUpdate={onUpdate}
-          //   onRemove={onRemove}
-          // />
-        ))
-        : null}
+      {blogs ? (
+        <List>
+          {blogs.map((blog) => (
+            <>
+              <ListItem key={blog.id}>
+                <Link to={`/blogs/${blog.id}`}>
+                  <ListItemText>
+                    <Typography variant="h6">{blog.title}</Typography>
+                  </ListItemText>
+                  {/*<br />*/}
+                </Link>
+              </ListItem>
+              <Divider sx={{ backgroundColor: '#f0f0f0' }} />
+            </>
+            // <Blog
+            //   key={blog.id}
+            //   currentUser={user}
+            //   blog={blog}
+            //   onUpdate={onUpdate}
+            //   onRemove={onRemove}
+            // />
+          ))}
+        </List>
+      ) : null}
     </div>
   )
 }

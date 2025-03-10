@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { logout } from '../reducers/userSlice.js'
 import userService from '../services/users'
+import { List, ListItem, ListItemText } from '@mui/material'
+import StickyNote2Icon from '@mui/icons-material/StickyNote2'
 
 function UserPage() {
   const id = useParams().id
@@ -18,7 +20,7 @@ function UserPage() {
     }
   }, [user])
 
-  if(!user.token){
+  if (!user.token) {
     return null
   }
 
@@ -26,11 +28,16 @@ function UserPage() {
     <div>
       <h2>{targetUser.name}</h2>
       <h3>Added blogs</h3>
-      <ul>
+      <List>
         {[...targetUser.blogs].map((blog) => (
-          <li key={blog.id}>{blog.title}</li>
+          <ListItem key={blog.id}>
+            <ListItemText>
+              <StickyNote2Icon/>
+              {blog.title}
+            </ListItemText>
+          </ListItem>
         ))}
-      </ul>
+      </List>
     </div>
   )
 }
