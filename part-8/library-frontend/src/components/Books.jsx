@@ -1,11 +1,19 @@
 import PropTypes from "prop-types";
+import {useQuery} from "@apollo/client";
+import {ALL_BOOKS} from "../queries.js";
 
 const Books = (props) => {
+  const response = useQuery(ALL_BOOKS)
+
   if (!props.show) {
     return null
   }
 
-  const books = []
+  if (response.loading) {
+    return <div>loading...</div>
+  }
+
+  const books = response.data.allBooks
 
   return (
     <div>

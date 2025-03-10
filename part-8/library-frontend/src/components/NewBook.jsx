@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import {useState} from 'react'
 import PropTypes from "prop-types";
+import {ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK} from "../queries.js";
+import {useMutation} from "@apollo/client";
 
 const NewBook = (props) => {
   const [title, setTitle] = useState('')
@@ -7,6 +9,13 @@ const NewBook = (props) => {
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
+  const [createBook] = useMutation(CREATE_BOOK, {
+    refetchQueries: [{query: ALL_AUTHORS}, {query: ALL_BOOKS}],
+    onError: (error) => {
+      const messages = error.graphQLErrors.map(e => e.message).join('\n')
+      props.setError(messages)
+    }
+  })
 
   if (!props.show) {
     return null
@@ -15,7 +24,14 @@ const NewBook = (props) => {
   const submit = async (event) => {
     event.preventDefault()
 
-    console.log('add book...')
+    await createBook({
+      variables: {
+        title,
+        author,
+        published: Number(published),
+        genres
+      }
+    })
 
     setTitle('')
     setPublished('')
@@ -36,14 +52,14 @@ const NewBook = (props) => {
           title
           <input
             value={title}
-            onChange={({ target }) => setTitle(target.value)}
+            onChange={({target}) => setTitle(target.value)}
           />
         </div>
         <div>
           author
           <input
             value={author}
-            onChange={({ target }) => setAuthor(target.value)}
+            onChange={({target}) => setAuthor(target.value)}
           />
         </div>
         <div>
@@ -51,13 +67,13 @@ const NewBook = (props) => {
           <input
             type="number"
             value={published}
-            onChange={({ target }) => setPublished(target.value)}
+            onChange={({target}) => setPublished(target.value)}
           />
         </div>
         <div>
           <input
             value={genre}
-            onChange={({ target }) => setGenre(target.value)}
+            onChange={({target}) => setGenre(target.value)}
           />
           <button onClick={addGenre} type="button">
             add genre
@@ -72,6 +88,7 @@ const NewBook = (props) => {
 
 NewBook.propTypes = {
   show: PropTypes.bool.isRequired,
+  setError: PropTypes.func.isRequired,
 }
 
 export default NewBook
