@@ -6,6 +6,7 @@ mongoose.set('strictQuery', false)
 const Book = require('./models/book')
 const Author = require('./models/author')
 const config = require("./utils/config")
+const {GraphQLError} = require("graphql/error");
 
 console.log('connecting to', config.MONGODB_URI)
 mongoose.connect(config.MONGODB_URI)
@@ -99,7 +100,12 @@ const resolvers = {
       // check if author exists
       let foundAuthors = await Author.find({name: args.name})
       if (foundAuthors.length === 0){
-        // TODO : raise error
+        throw new GraphQLError(`No authors with name ${args.name} found.`, {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.name
+          }
+        })
       }
 
       // update author
