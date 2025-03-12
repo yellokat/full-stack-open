@@ -95,6 +95,22 @@ const resolvers = {
       const createdBook = await newBook.save()
       return await createdBook.populate('author', {name:1, born:1})
     },
+    editAuthor: async (root, args) =>{
+      // check if author exists
+      let foundAuthors = await Author.find({name: args.name})
+      if (foundAuthors.length === 0){
+        // TODO : raise error
+      }
+
+      // update author
+      const updatedAuthor = await Author.findByIdAndUpdate(
+        foundAuthors[0].id,
+        { born: args.setBornTo },
+        { new: true, runValidators: true}
+      )
+
+      return updatedAuthor
+    }
   }
 }
 
