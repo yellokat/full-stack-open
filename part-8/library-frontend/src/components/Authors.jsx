@@ -38,6 +38,32 @@ const Authors = (props) => {
     }
   })
 
+  const SetBirthYearForm = () => {
+    if (props.isLoggedIn === false) {
+      return null
+    }
+    return (<>
+      <h2>Set birthyear</h2>
+      <form onSubmit={handleSubmit}>
+
+        <Select
+          defaultValue={selectedOption}
+          onChange={setSelectedOption}
+          options={nameOptions}
+        />
+
+        <div>
+          born
+          <input
+            value={born}
+            onChange={({target}) => setBorn(target.value)}
+          />
+        </div>
+        <button type="submit">update author</button>
+      </form>
+    </>)
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
 
@@ -71,30 +97,14 @@ const Authors = (props) => {
         ))}
         </tbody>
       </table>
-      <h2>Set birthyear</h2>
-      <form onSubmit={handleSubmit}>
-
-        <Select
-          defaultValue={selectedOption}
-          onChange={setSelectedOption}
-          options={nameOptions}
-        />
-
-        <div>
-          born
-          <input
-            value={born}
-            onChange={({target}) => setBorn(target.value)}
-          />
-        </div>
-        <button type="submit">update author</button>
-      </form>
+      <SetBirthYearForm/>
     </div>
   )
 }
 
 Authors.propTypes = {
   show: PropTypes.bool.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired,
   setError: PropTypes.func.isRequired,
 }
 
