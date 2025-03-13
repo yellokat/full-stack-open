@@ -15,14 +15,14 @@ function LoginForm({ handleLogin, show }) {
     <div>
       <form onSubmit={(event) => handleLogin(event, {username, password})}>
         <div>
-          title
+          login
           <input
             value={username}
             onChange={({target}) => setUsername(target.value)}
           />
         </div>
         <div>
-          author
+          password
           <input
             type="password"
             value={password}
