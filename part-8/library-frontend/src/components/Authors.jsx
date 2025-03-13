@@ -6,8 +6,8 @@ import Select from "react-select";
 
 const Authors = (props) => {
   const response = useQuery(ALL_AUTHORS)
-  const [selectedOption, setSelectedOption] = useState(null);
   const [born, setBorn] = useState("")
+  const [selectedOption, setSelectedOption] = useState(null);
   const [editAuthor, editAuthorResult] = useMutation(EDIT_AUTHOR, {
     refetchQueries: [{query: ALL_AUTHORS}],
     onError: (error) => {
@@ -37,32 +37,6 @@ const Authors = (props) => {
       label: author.name,
     }
   })
-
-  const SetBirthYearForm = () => {
-    if (props.isLoggedIn === false) {
-      return null
-    }
-    return (<>
-      <h2>Set birthyear</h2>
-      <form onSubmit={handleSubmit}>
-
-        <Select
-          defaultValue={selectedOption}
-          onChange={setSelectedOption}
-          options={nameOptions}
-        />
-
-        <div>
-          born
-          <input
-            value={born}
-            onChange={({target}) => setBorn(target.value)}
-          />
-        </div>
-        <button type="submit">update author</button>
-      </form>
-    </>)
-  }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -97,7 +71,26 @@ const Authors = (props) => {
         ))}
         </tbody>
       </table>
-      <SetBirthYearForm/>
+      {
+        (!props.isLoggedIn) ? null : (<>
+          <h2>Set birthyear</h2>
+          <form onSubmit={handleSubmit}>
+            <Select
+              defaultValue={selectedOption}
+              onChange={setSelectedOption}
+              options={nameOptions}
+            />
+            <div>
+              born
+              <input
+                value={born}
+                onChange={({target}) => setBorn(target.value)}
+              />
+            </div>
+            <button type="submit">update author</button>
+          </form>
+        </>)
+      }
     </div>
   )
 }

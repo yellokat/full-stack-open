@@ -28,4 +28,4 @@ schema.set('toJSON', {
 
 schema.plugin(uniqueValidator)
 
-module.exports = mongoose.model('User', schema)
+module.exports = mongoose.model('LibraryUser', schema)
