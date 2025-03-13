@@ -38,6 +38,16 @@ const resolvers = {
     allAuthors: async () => {
       return await Author.find({}).populate('books', {title: 1, published: 1, genres: 1, id: 1, author: 1})
     },
+    allGenres: async () => {
+      const allBooks = await Book.find({})
+      const allGenres = [...
+        new Set(
+          [...allBooks].map(book => {
+            return book.genres
+          }).reduce((acc, genre) => acc.concat(genre))
+        )]
+      return Array.from(allGenres)
+    },
     me: (root, args, context) => {
       if (!context.currentUser) {
         throw new GraphQLError('You are not logged in.', {
