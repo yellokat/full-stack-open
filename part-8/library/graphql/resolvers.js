@@ -9,6 +9,15 @@ const { PubSub } = require('graphql-subscriptions')
 const pubsub = new PubSub()
 
 const resolvers = {
+  Author : {
+    // bookCount:(root) => {
+    //   return 0
+    // }
+    bookCount : async (root) => {
+      console.log('calculating bookCount')
+      return (await Book.find({ author : root._id })).length
+    }
+  },
   Query: {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
@@ -42,7 +51,7 @@ const resolvers = {
         })
       }
       return context.currentUser
-    }
+    },
   },
   Mutation: {
     addBook: async (root, args, context) => {
