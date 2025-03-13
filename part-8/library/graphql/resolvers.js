@@ -5,10 +5,15 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
-const { PubSub } = require('graphql-subscriptions')
+const {PubSub} = require('graphql-subscriptions')
 const pubsub = new PubSub()
 
 const resolvers = {
+  Author: {
+    bookCount: (root) => {
+      return root.books.length
+    }
+  },
   Query: {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
@@ -31,10 +36,10 @@ const resolvers = {
         .populate('author', {name: 1, born: 1})
     },
     allAuthors: async () => {
-      return await Author.find({})
+      return await Author.find({}).populate('books', {title: 1, published: 1, genres: 1, id: 1, author: 1})
     },
     me: (root, args, context) => {
-      if(!context.currentUser){
+      if (!context.currentUser) {
         throw new GraphQLError('You are not logged in.', {
           extensions: {
             code: 'BAD_USER_INPUT'
@@ -42,12 +47,12 @@ const resolvers = {
         })
       }
       return context.currentUser
-    }
+    },
   },
   Mutation: {
     addBook: async (root, args, context) => {
       // identity check
-      if(!context.currentUser){
+      if (!context.currentUser) {
         throw new GraphQLError('You are not logged in.', {
           extensions: {
             code: 'BAD_USER_INPUT'
@@ -63,20 +68,25 @@ const resolvers = {
         const newAuthor = new Author({name: args.author})
         foundAuthors.push(await newAuthor.save())
       }
+      const targetAuthor = foundAuthors[0]
 
       // create book
-      const newBook = new Book({...args, author: foundAuthors[0].id})
+      const newBook = new Book({...args, author: targetAuthor.id})
       const createdBook = await newBook.save()
       const resultBook = await createdBook.populate('author', {name: 1, born: 1})
 
+      // assign book to author as well
+      targetAuthor.books.push(resultBook.id)
+      await targetAuthor.save()
+
       // publish creation of book to subscribers
-      pubsub.publish('BOOK_ADDED', { bookAdded: resultBook })
+      pubsub.publish('BOOK_ADDED', {bookAdded: resultBook})
 
       return resultBook
     },
     editAuthor: async (root, args, context) => {
       // identity check
-      if(!context.currentUser){
+      if (!context.currentUser) {
         throw new GraphQLError('You are not logged in.', {
           extensions: {
             code: 'BAD_USER_INPUT'
@@ -115,7 +125,7 @@ const resolvers = {
       const passwordHash = await bcrypt.hash(password, saltRounds)
 
       // create user -> save user -> return
-      const newUser = new User({ username, passwordHash, favoriteGenre })
+      const newUser = new User({username, passwordHash, favoriteGenre})
       const createdUser = await newUser.save()
       return createdUser
     },
@@ -124,7 +134,7 @@ const resolvers = {
       const password = args.password
 
       // find user and compare password
-      const user = await User.findOne({ username })
+      const user = await User.findOne({username})
       const passwordCorrect = user === null
         ? false
         : await bcrypt.compare(password, user.passwordHash)
@@ -144,7 +154,7 @@ const resolvers = {
         id: user._id,
       }
 
-      return { value: jwt.sign(userForToken, config.JWT_SECRET) }
+      return {value: jwt.sign(userForToken, config.JWT_SECRET)}
     }
   },
   Subscription: {
