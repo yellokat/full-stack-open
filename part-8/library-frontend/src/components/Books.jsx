@@ -1,9 +1,15 @@
 import PropTypes from "prop-types";
-import {useQuery} from "@apollo/client";
-import {ALL_BOOKS} from "../queries.js";
+import {useQuery, useSubscription} from "@apollo/client";
+import {ALL_BOOKS, BOOK_ADDED} from "../queries.js";
 
 const Books = (props) => {
   const response = useQuery(ALL_BOOKS)
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      window.alert(`A new book was added to the database : ${data.data.bookAdded.title}`)
+    }
+  })
+
 
   if (!props.show) {
     return null
