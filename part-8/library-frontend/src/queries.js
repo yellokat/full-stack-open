@@ -32,6 +32,14 @@ export const ALL_GENRES = gql`
     }
 `
 
+export const ME = gql`
+  query{
+      me{
+          favoriteGenre
+      }
+  }
+`
+
 export const CREATE_BOOK = gql`
     mutation createBook($title: String!, $author: String!, $published: Int!, $genres: [String!]!) {
         addBook(

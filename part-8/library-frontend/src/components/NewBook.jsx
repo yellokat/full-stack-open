@@ -17,7 +17,7 @@ const NewBook = (props) => {
     }
   })
 
-  if (!props.show) {
+  if (!props.show || !props.isLoggedIn) {
     return null
   }
 
@@ -89,6 +89,7 @@ const NewBook = (props) => {
 NewBook.propTypes = {
   show: PropTypes.bool.isRequired,
   setError: PropTypes.func.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired
 }
 
 export default NewBook

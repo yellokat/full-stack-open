@@ -4,12 +4,14 @@ import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm.jsx";
-import {useApolloClient, useMutation} from "@apollo/client";
-import {ALL_AUTHORS, ALL_BOOKS, LOGIN} from "./queries.js";
+import {useApolloClient, useMutation, useQuery} from "@apollo/client";
+import {ALL_AUTHORS, ALL_BOOKS, LOGIN, ME} from "./queries.js";
+import Recommendations from "./components/Recommendations";
 
 const App = () => {
   const [page, setPage] = useState("authors");
   const [errorMessage, setErrorMessage] = useState(null)
+  const [favoriteGenre, setFavoriteGenre] = useState(null)
   const [token, setToken] = useState(null)
   const client = useApolloClient()
 
@@ -29,6 +31,16 @@ const App = () => {
       showNotification(messages)
     }
   })
+
+  // my info query
+  const myInfoResponse = useQuery(ME)
+
+  // my info query result handler
+  useEffect(() => {
+    if (myInfoResponse.loading === false && !myInfoResponse.error){
+      setFavoriteGenre(myInfoResponse.data.me.favoriteGenre)
+    }
+  }, [myInfoResponse]);
 
   // show notification handler
   const showNotification = (message) => {
@@ -51,15 +63,25 @@ const App = () => {
     setToken(generatedToken)
     localStorage.setItem('token', generatedToken)
     setPage("authors")
+    await myInfoResponse.refetch()
   }
 
   // logout handler
   const handleLogout = async (event) => {
     event.preventDefault()
+
+    // navigate to front page
+    await setPage("authors")
+
+    // clear credentials
     setToken(null)
     localStorage.removeItem('token')
+
     // clear apollo query cache
     await client.resetStore()
+
+    // refetch my info
+    await myInfoResponse.refetch()
   }
 
   return (
@@ -71,6 +93,7 @@ const App = () => {
         {token ?
           <>
             <button onClick={() => setPage("add")}>add book</button>
+            <button onClick={() => setPage("recommendations")}>recommendations</button>
             <button onClick={handleLogout}>logout</button>
           </>
           :
@@ -84,7 +107,8 @@ const App = () => {
       {/*content*/}
       <Authors show={page === "authors"} setError={showNotification} isLoggedIn={ !!token }/>
       <Books show={page === "books"}/>
-      <NewBook show={page === "add"} setError={showNotification}/>
+      <NewBook show={page === "add"} setError={showNotification} isLoggedIn={ !!token }/>
+      <Recommendations show={page === "recommendations"} favoriteGenre={favoriteGenre} isLoggedIn={ !!token }/>
       <LoginForm show={page === "login"} handleLogin={handleLogin} setError={showNotification}/>
     </div>
   );
