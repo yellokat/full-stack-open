@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
+const { PubSub } = require('graphql-subscriptions')
+const pubsub = new PubSub()
 
 const resolvers = {
   Query: {
@@ -65,7 +67,12 @@ const resolvers = {
       // create book
       const newBook = new Book({...args, author: foundAuthors[0].id})
       const createdBook = await newBook.save()
-      return await createdBook.populate('author', {name: 1, born: 1})
+      const resultBook = await createdBook.populate('author', {name: 1, born: 1})
+
+      // publish creation of book to subscribers
+      pubsub.publish('BOOK_ADDED', { bookAdded: resultBook })
+
+      return resultBook
     },
     editAuthor: async (root, args, context) => {
       // identity check
@@ -139,7 +146,12 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, config.JWT_SECRET) }
     }
-  }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterableIterator('BOOK_ADDED')
+    },
+  },
 }
 
 module.exports = resolvers
