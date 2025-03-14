@@ -11,9 +11,17 @@ interface exerciseCalculateResults {
 }
 
 const calculateExercises = (hours: number[]):exerciseCalculateResults => {
+    if(process.argv[9] !== undefined){
+        throw new Error("Exactly 7 numbers expected.")
+    }
     if (hours.length !== 7){
         throw new Error("Input an array of 7 numbers.")
     }
+    hours.forEach((hour: number, index:number) => {
+        if (hour !== 0 && !hour){
+            throw new Error(`Invalid input in array index ${index}`)
+        }
+    })
 
     const trainingDays:number = hours.filter((hour) => hour !== 0).length
     const average:number = (hours.reduce((a:number, b:number):number => a+b) / 7);
@@ -45,7 +53,11 @@ const calculateExercises = (hours: number[]):exerciseCalculateResults => {
 }
 
 try {
-    console.log(calculateExercises([1, 0.4, 1.2, 0.8, 0, 0.5, 0]));
+    const hours:number[] = []
+    for (let i:number=0; i<7; i++) {
+        hours.push(Number(process.argv[2 + i]))
+    }
+    console.log(calculateExercises(hours));
 } catch (error: unknown) {
     let errorMessage = 'Something went wrong: '
     if (error instanceof Error) {

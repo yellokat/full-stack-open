@@ -1,8 +1,11 @@
 type Operation = 'multiply' | 'add' | 'divide';
 
 const calculateBmi = (heightCm: number, weightKg: number): string => {
-    if (heightCm === 0) {
-        throw new Error("Division By zero is not allowed.")
+    if (heightCm === 0 || weightKg === 0) {
+        throw new Error("Invalid input.")
+    }
+    if(!heightCm || !weightKg) {
+        throw new Error("calculateBmi requires two arguments that are numbers.")
     }
     const bmi: number = weightKg / (heightCm / 100) ** 2
 
@@ -28,7 +31,9 @@ const calculateBmi = (heightCm: number, weightKg: number): string => {
 }
 
 try {
-    console.log(calculateBmi(174, 80));
+    const heightCm: number = Number(process.argv[2])
+    const weightKg: number = Number(process.argv[3])
+    console.log(calculateBmi(heightCm, weightKg));
 } catch (error: unknown) {
     let errorMessage = 'Something went wrong: '
     if (error instanceof Error) {
