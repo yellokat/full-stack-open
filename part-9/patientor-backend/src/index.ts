@@ -3,6 +3,7 @@ import cors from 'cors';
 import pingRouter from './routes/ping';
 import patientRouter from './routes/patients';
 import diagnosisRouter from './routes/diagnoses';
+import middleware from "./utils/middleware";
 
 // ========================================================================
 // initialize app
@@ -19,6 +20,12 @@ app.use(express.json());
 app.use('/api/ping', pingRouter);
 app.use('/api/patients', patientRouter);
 app.use('/api/diagnosis', diagnosisRouter);
+
+// ========================================================================
+// middleware
+// ========================================================================
+
+app.use(middleware.errorMiddleware);
 
 // ========================================================================
 // start server

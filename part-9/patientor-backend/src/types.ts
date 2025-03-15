@@ -1,3 +1,5 @@
+import z from 'zod';
+
 export enum Gender {
     MALE = 'male',
     FEMALE = 'female',
@@ -18,6 +20,14 @@ export interface Patient {
     gender: Gender;
     occupation: string;
 }
+
+export const NewPatientSchema = z.object({
+    name: z.string(),
+    dateOfBirth: z.string().date(),
+    ssn: z.string(),
+    gender: z.nativeEnum(Gender),
+    occupation: z.string()
+});
 
 export type PublicPatient = Omit<Patient, 'ssn'>;
 
