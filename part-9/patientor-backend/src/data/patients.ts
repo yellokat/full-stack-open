@@ -1,6 +1,6 @@
-import {PatientEntry} from "../types";
+import {Patient} from "../types";
 
-const patientEntries: PatientEntry[] = [
+const data = [
     {
         "id": "d2773336-f723-11e9-8f0b-362b9e155667",
         "name": "John McClane",
@@ -43,4 +43,6 @@ const patientEntries: PatientEntry[] = [
     }
 ];
 
-export default patientEntries;
+const patientDatabase = data as Patient[];
+
+export default patientDatabase;

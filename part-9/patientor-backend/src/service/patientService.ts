@@ -1,23 +1,33 @@
-import {PatientEntry, PublicPatientEntry} from "../types";
-import patientEntries from "../data/patients";
+import {v1 as uuid} from 'uuid';
+import {NewPatient, Patient, PublicPatient} from "../types";
+import patientDatabase from "../data/patients";
 
-export const getPatientEntries = (): PatientEntry[] => {
-    return patientEntries.map(({id, name, dateOfBirth, ssn, gender, occupation}) => ({
+const getPatients = (): Patient[] => {
+    return patientDatabase;
+};
+
+const getPublicPatients = (): PublicPatient[] => {
+    return patientDatabase.map(({id, name, dateOfBirth, gender, occupation}) => ({
         id,
         name,
         dateOfBirth,
-        ssn,
         gender,
         occupation
     }));
 };
 
-export const getPublicPatientEntries = (): PublicPatientEntry[] => {
-    return patientEntries.map(({id, name, dateOfBirth, gender, occupation}) => ({
+const addPatient = (entry: NewPatient):Patient=>{
+    const id:string = uuid();
+    const newPatient = {
         id,
-        name,
-        dateOfBirth,
-        gender,
-        occupation
-    }));
+        ...entry
+    };
+    patientDatabase.push(newPatient);
+    return newPatient;
+};
+
+export default {
+    getPatients,
+    getPublicPatients,
+    addPatient,
 };
