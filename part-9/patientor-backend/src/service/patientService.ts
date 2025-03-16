@@ -18,7 +18,7 @@ const getPublicPatients = (): PublicPatient[] => {
 };
 
 const findPublicPatientsById = (id: string): PublicPatient | undefined => {
-    return getPublicPatients().find((patient: PublicPatient) => {
+    return patientDatabase.find((patient: PublicPatient) => {
         return patient.id === id;
     });
 };
