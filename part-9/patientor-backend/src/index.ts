@@ -19,7 +19,7 @@ app.use(express.json());
 
 app.use('/api/ping', pingRouter);
 app.use('/api/patients', patientRouter);
-app.use('/api/diagnosis', diagnosisRouter);
+app.use('/api/diagnoses', diagnosisRouter);
 
 // ========================================================================
 // middleware

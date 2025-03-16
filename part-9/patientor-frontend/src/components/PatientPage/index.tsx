@@ -1,19 +1,26 @@
 import {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import patientService from '../../services/patients';
-import {Entry, Gender, Patient} from "../../types.ts";
-import MaleIcon from '@mui/icons-material/Male'
-import FemaleIcon from '@mui/icons-material/Female'
+import diagnosisService from '../../services/diagnoses';
+import {Diagnosis, Entry, Gender, Patient} from "../../types.ts";
+import MaleIcon from '@mui/icons-material/Male';
+import FemaleIcon from '@mui/icons-material/Female';
 import TransgenderIcon from '@mui/icons-material/Transgender';
 
 const PatientPage = () => {
     const id: string = useParams().id as string;
     const [patient, setPatient] = useState<Patient>();
+    const [diagnoses, setDiagnoses] = useState<Diagnosis[]>();
     useEffect(() => {
         patientService.findById(id).then((patient: Patient) => setPatient(patient));
     }, []);
+    useEffect(() => {
+        diagnosisService.getAll().then((diagnoses: Diagnosis[]) => {
+            setDiagnoses(diagnoses);
+        });
+    }, []);
 
-    if (!patient) {
+    if (!patient || !diagnoses) {
         return null;
     }
 
@@ -35,7 +42,10 @@ const PatientPage = () => {
                 (!entry.diagnosisCodes) ? null :
                     <ul>
                         {
-                            entry.diagnosisCodes.map(diagnosisCode => (<li>{diagnosisCode}</li>))
+                            entry.diagnosisCodes.map(diagnosisCode => {
+                                const targetDiagnosis = diagnoses.find((e)=>e.code===diagnosisCode)!;
+                                return (<li>{diagnosisCode} {targetDiagnosis.name}</li>);
+                            })
                         }
                     </ul>
             }
