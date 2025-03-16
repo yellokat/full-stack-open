@@ -10,6 +10,15 @@ router.get('/', (_req, res: Response<PublicPatient[]>) => {
     res.send(publicPatients);
 });
 
+router.get('/:id', (req, res: Response<PublicPatient>) => {
+    const patient = patientService.findPublicPatientsById(req.params.id);
+    if(patient){
+        res.send(patient);
+    }else{
+        res.sendStatus(404);
+    }
+});
+
 router.post('/', middleware.newPatientParser, (req: Request<unknown, unknown, NewPatient>, res:Response<PublicPatient>)=>{
     const addedPatient = patientService.addPatient(req.body);
     res.json(addedPatient);
