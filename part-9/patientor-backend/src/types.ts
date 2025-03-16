@@ -22,6 +22,44 @@ export interface Patient {
     entries: Entry[];
 }
 
+interface DiagnosisBase {
+    id: string;
+    description: string;
+    date: string;
+    specialist: string;
+    diagnosisCodes?: Array<Diagnosis['code']>;
+}
+
+export enum HealthCheckRating {
+    "Healthy" = 0,
+    "LowRisk" = 1,
+    "HighRisk" = 2,
+    "CriticalRisk" = 3
+}
+
+interface HealthCheckEntry extends DiagnosisBase {
+    type: "HealthCheck";
+    healthCheckRating: HealthCheckRating;
+}
+
+interface DischargeEntry {
+    date: string;
+    criteria: string;
+}
+
+interface HospitalEntry extends DiagnosisBase {
+    discharge: DischargeEntry;
+}
+
+interface OccupationalHealthcareEntry extends DiagnosisBase {
+    employername: string;
+}
+
+export type Entry =
+    | HospitalEntry
+    | OccupationalHealthcareEntry
+    | HealthCheckEntry;
+
 export const NewPatientSchema = z.object({
     name: z.string(),
     dateOfBirth: z.string().date(),
@@ -29,10 +67,6 @@ export const NewPatientSchema = z.object({
     gender: z.nativeEnum(Gender),
     occupation: z.string()
 });
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Entry {
-}
 
 export type PublicPatient = Omit<Patient, 'ssn' | 'entries'>;
 
