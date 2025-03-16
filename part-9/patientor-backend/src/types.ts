@@ -48,11 +48,13 @@ interface DischargeEntry {
 }
 
 interface HospitalEntry extends DiagnosisBase {
+    type: "Hospital";
     discharge: DischargeEntry;
 }
 
 interface OccupationalHealthcareEntry extends DiagnosisBase {
-    employername: string;
+    type: "OccupationalHealthcare";
+    employerName: string;
 }
 
 export type Entry =
