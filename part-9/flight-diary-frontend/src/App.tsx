@@ -3,9 +3,11 @@ import NewDiaryForm from "./components/newDiaryForm";
 import {useEffect, useState} from "react";
 import {DiaryEntry} from "./types";
 import diaryService from "./services/diaryService";
+import Notification from "./components/notification";
 
 const App = () => {
     const [diaries, setDiaries] = useState<DiaryEntry[]>([])
+    const [notification, setNotification] = useState<string>('')
     useEffect(() => {
         diaryService
             .getAll()
@@ -18,9 +20,17 @@ const App = () => {
         setDiaries([...diaries, newDiary])
     }
 
+    const handleError = (message: string) => {
+        setNotification(message)
+        setTimeout(()=>{
+            setNotification('')
+        }, 1000)
+    }
+
     return (
         <>
-            <NewDiaryForm onCreateCallback={onCreateDiaryCallback}/>
+            <Notification errorMessage={notification}/>
+            <NewDiaryForm onCreateCallback={onCreateDiaryCallback} handleError={handleError}/>
             <DiaryList diaries={diaries}/>
         </>
     )
