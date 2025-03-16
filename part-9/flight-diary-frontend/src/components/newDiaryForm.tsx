@@ -54,10 +54,32 @@ const NewDiaryForm = ({onCreateCallback, handleError}: {
             }}>
                 <div>
                     date
-                    <input
-                        value={date}
-                        onChange={({target}) => setDate(target.value)}
-                    />
+                    <input type="date" id="date" name="date" value={date}
+                           onChange={({target}) => setDate(target.value)}/>
+                </div>
+                <div>
+                    Visibility
+                    Great <input type="radio" name="visibility" value="great"
+                                 onChange={(event) => setVisibility(event.target.value)}/>
+                    Good <input type="radio" name="visibility" value="good"
+                                onChange={(event) => setVisibility(event.target.value)}/>
+                    Ok <input type="radio" name="visibility" value="ok"
+                              onChange={(event) => setVisibility(event.target.value)}/>
+                    Poor <input type="radio" name="visibility" value="poor"
+                                onChange={(event) => setVisibility(event.target.value)}/>
+                </div>
+                <div>
+                    Weather
+                    Sunny <input type="radio" name="weather" value="sunny"
+                                 onChange={(event) => setWeather(event.target.value)}/>
+                    Rainy <input type="radio" name="weather" value="rainy"
+                                 onChange={(event) => setWeather(event.target.value)}/>
+                    Cloudy <input type="radio" name="weather" value="cloudy"
+                                  onChange={(event) => setWeather(event.target.value)}/>
+                    Stormy <input type="radio" name="weather" value="stormy"
+                                  onChange={(event) => setWeather(event.target.value)}/>
+                    Windy <input type="radio" name="weather" value="windy"
+                                 onChange={(event) => setWeather(event.target.value)}/>
                 </div>
                 <div>
                     visibility
