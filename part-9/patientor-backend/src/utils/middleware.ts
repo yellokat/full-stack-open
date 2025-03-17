@@ -1,10 +1,21 @@
+// noinspection DuplicatedCode
+
 import {Request, Response, NextFunction} from 'express';
-import {NewPatientSchema} from "../types";
+import {NewPatientSchema, NewEntrySchema} from "../types/schemas";
 import z from "zod";
 
 const newPatientParser = (req: Request, _res: Response, next: NextFunction) => {
     try {
         NewPatientSchema.parse(req.body);
+        next();
+    } catch (error: unknown) {
+        next(error);
+    }
+};
+
+const newEntryParser = (req: Request, _res: Response, next: NextFunction) => {
+    try {
+        NewEntrySchema.parse(req.body);
         next();
     } catch (error: unknown) {
         next(error);
@@ -19,4 +30,4 @@ const errorMiddleware = (error: unknown, _req: Request, res: Response, next: Nex
     }
 };
 
-export default { newPatientParser, errorMiddleware };
+export default { newPatientParser, newEntryParser, errorMiddleware };
