@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Diagnosis } from '../types';
+import { Diagnosis } from '../types/types.ts';
 
 import { apiBaseUrl } from "../constants";
 
